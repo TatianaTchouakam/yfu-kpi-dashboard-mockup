@@ -5,70 +5,237 @@
 <title>YFU KPI Dashboard Mockup</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#f4f7f9;color:#203040}.head{background:#17324d;color:#fff;padding:24px 32px}.head b{font-size:25px}.head small{display:block;margin-top:6px;opacity:.8}.tabs{display:flex;background:#fff;border-bottom:1px solid #ddd;padding-left:25px;overflow:auto}.tabs button{padding:15px 18px;border:0;background:#fff;color:#687580;font-weight:bold;cursor:pointer}.tabs button.on{color:#17324d;border-bottom:3px solid #3c8d8a}.wrap{max-width:1400px;margin:auto;padding:25px}.page{display:none}.page.on{display:block}h1{margin:0 0 5px;color:#17324d}.sub{color:#6d7b88;font-size:13px;margin-bottom:20px}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:15px}.card{background:#fff;border:1px solid #e0e6eb;border-radius:12px;padding:18px}.kpi{grid-column:span 2}.wide{grid-column:span 6}.full{grid-column:1/-1}.klabel{font-size:12px;color:#6d7b88}.value{font-size:28px;font-weight:bold;color:#17324d;margin-top:10px}.note{font-size:11px;color:#71808b;margin-top:7px}.title{font-weight:bold;margin-bottom:5px}.muted{font-size:12px;color:#6d7b88;margin-bottom:12px}canvas{max-height:280px}.filters{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}.filters select{padding:9px;border:1px solid #d8e0e5;border-radius:7px;background:#fff}.funnel{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px}.step{height:36px;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-radius:5px;font-size:12px;font-weight:bold}.s1{width:92%;background:#557d9a}.s2{width:78%;background:#4c8795}.s3{width:64%;background:#4d9290}.s4{width:51%;background:#5a9a7d}.s5{width:40%;background:#709a70}.s6{width:30%;background:#8a9a69}.status{padding:4px 8px;border-radius:12px;font-size:10px;font-weight:bold}.ok{background:#e7f4eb;color:#34704b}.watch{background:#fff2dd;color:#98631d}.review{background:#fbe8e8;color:#9d4444}.missing{background:#eceff2;color:#687580}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:10px;border-bottom:1px solid #e2e7eb;text-align:left}th{color:#6d7b88}@media(max-width:900px){.kpi,.wide{grid-column:span 6}}@media(max-width:600px){.kpi,.wide{grid-column:1/-1}.wrap{padding:15px}}
+:root{
+  /* Official YFU brand palette */
+  --purple:#642869;      /* YFU Royal Purple */
+  --purple2:#7d3d84;
+  --darkblue:#005A82;    /* Donors */
+  --blue:#0AAFE6;        /* Educators */
+  --teal:#00B4B9;        /* Study Abroad */
+  --orange:#F59100;      /* Host a Student */
+  --red:#E6004B;         /* Volunteer */
+  --green:#C3D74B;       /* Alumni */
+  --green-ink:#6b7a1f;   /* Alumni, darkened for text contrast */
+  --ink:#555555;         /* YFU brand text grey */
+  --muted:#7c7c86; --line:#e8e4ea; --bg:#f5f3f6; --grey:#9098a1;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.head{background:linear-gradient(120deg,var(--purple) 0%,#4d2a63 55%,var(--darkblue) 130%);color:#fff;padding:28px 36px;position:relative;overflow:hidden}
+.head::after{content:"";position:absolute;top:-60%;right:-8%;width:420px;height:420px;background:radial-gradient(circle,rgba(255,255,255,.10) 0%,rgba(255,255,255,0) 70%)}
+.head-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;position:relative;z-index:1}
+.head b{font-size:26px;letter-spacing:.2px}
+.head small{display:block;margin-top:6px;opacity:.85;font-size:12.5px}
+.pillbar{display:flex;gap:10px;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);backdrop-filter:blur(2px);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.pill .dot{width:7px;height:7px;border-radius:50%}
+.disclaimer{position:relative;z-index:1;margin-top:16px;font-size:11px;opacity:.8;max-width:920px;line-height:1.5}
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);padding-left:25px;overflow:auto;position:sticky;top:0;z-index:5;box-shadow:0 2px 6px rgba(30,10,40,.05)}
+.tabs button{padding:16px 18px;border:0;background:#fff;color:var(--muted);font-weight:700;cursor:pointer;font-size:13.5px;letter-spacing:.2px;border-bottom:3px solid transparent;transition:.15s}
+.tabs button:hover{color:var(--purple)}
+.tabs button.on{color:var(--purple);border-bottom:3px solid var(--purple)}
+.wrap{max-width:1440px;margin:auto;padding:26px}
+.page{display:none;animation:fade .25s ease}
+.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+h1{margin:0 0 4px;color:var(--purple);font-size:22px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(30,10,40,.05);transition:.18s;position:relative}
+.card:hover{box-shadow:0 8px 20px rgba(30,10,40,.10);transform:translateY(-2px)}
+.kpi{grid-column:span 3;border-top:3px solid var(--purple)}
+.kpi.teal{border-top-color:var(--teal)}
+.kpi.blue{border-top-color:var(--blue)}
+.kpi.orange{border-top-color:var(--orange)}
+.kpi.darkblue{border-top-color:var(--darkblue)}
+.kpi.green{border-top-color:var(--green)}
+.wide{grid-column:span 6}
+.third{grid-column:span 4}
+.full{grid-column:1/-1}
+.klabel{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.value{font-size:27px;font-weight:800;color:var(--purple);margin-top:9px;display:flex;align-items:baseline;gap:8px}
+.trend{font-size:12.5px;font-weight:700;padding:2px 7px;border-radius:8px}
+.up{color:var(--green-ink);background:#f1f5df}
+.down{color:var(--red);background:#fde7ee}
+.flat{color:var(--grey);background:#eef1f3}
+.note{font-size:11px;color:#8a8a92;margin-top:8px;line-height:1.4}
+.title{font-weight:800;margin-bottom:2px;color:var(--purple);font-size:14.5px}
+.muted{font-size:11.5px;color:var(--muted);margin-bottom:12px}
+canvas{max-height:270px}
+.filters{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.filters select{padding:9px 12px;border:1px solid #ddd6e0;border-radius:8px;background:#fff;font-size:12.5px;color:var(--ink)}
+.sectionhead{font-size:12px;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:.6px;margin:22px 0 12px;grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.sectionhead::after{content:"";flex:1;height:1px;background:var(--line)}
+.funnel{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 0}
+.step{color:#fff;display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-radius:8px;font-size:12.5px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.step small{display:block;font-weight:600;opacity:.85;font-size:10.5px;margin-top:2px}
+.s1{width:96%;background:linear-gradient(90deg,#642869,#7d3d84)}
+.s2{width:74%;background:linear-gradient(90deg,#7d3d84,#0AAFE6)}
+.s3{width:44%;background:linear-gradient(90deg,#0AAFE6,#00B4B9)}
+.s4{width:33%;background:linear-gradient(90deg,#00B4B9,#4fae76)}
+.s5{width:31%;background:linear-gradient(90deg,#F59100,#e6004b)}
+.s6{width:30%;background:linear-gradient(90deg,#005A82,#0AAFE6)}
+.arrow{font-size:10px;color:var(--muted);font-weight:700}
+.status{padding:4px 9px;border-radius:12px;font-size:10px;font-weight:800;letter-spacing:.3px}
+.ok{background:#f1f5df;color:#5b6a1a}
+.watch{background:#fff1e0;color:#a05e00}
+.review{background:#fde7ee;color:#a0003a}
+.missing{background:#eceff2;color:#687580}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:800}
+tr:hover td{background:#faf8fb}
+.badge{display:inline-block;padding:2px 8px;border-radius:7px;font-size:10.5px;font-weight:700}
+.b-purple{background:#f1e8f2;color:var(--purple)}
+.b-teal{background:#e0f4f4;color:#017377}
+.b-orange{background:#fff1e0;color:#a05e00}
+.b-red{background:#fde7ee;color:#a0003a}
+@media(max-width:1000px){.kpi{grid-column:span 4}.wide,.third{grid-column:span 6}}
+@media(max-width:640px){.kpi,.wide,.third{grid-column:1/-1}.wrap{padding:14px}.head{padding:22px}}
 </style></head>
 <body>
-<div class="head"><b>YFU · KPI Dashboard</b><small>PB1 mockup · KPI Dictionary v3 · September 2026</small></div>
+<div class="head">
+  <div class="head-row">
+    <div>
+      <b>YFU &middot; Recruitment Funnel KPI Dashboard</b>
+      <small>PB1 mockup &middot; KPI Dictionary v3.1 &middot; 21 September 2026</small>
+    </div>
+    <div class="pillbar">
+      <div class="pill"><span class="dot" style="background:#c3d74b"></span>43 KPIs total</div>
+      <div class="pill"><span class="dot" style="background:#c3d74b"></span>41 validated</div>
+      <div class="pill"><span class="dot" style="background:#F59100"></span>1 partial</div>
+      <div class="pill"><span class="dot" style="background:#e6004b"></span>2 rejected</div>
+    </div>
+  </div>
+  <div class="disclaimer">This is a layout mockup to help YFU choose which KPIs to feature and how — use it to react to the format, not the exact numbers. Funnel, Contract and Market figures are real (validated on the Intranet export and Gesamtmarktdaten). Values marked "illustrative" are realistic placeholders standing in for data sources not yet connected (GA4, Social Media API), so you can see the intended shape of each chart.</div>
+</div>
 <div class="tabs">
 <button class="on" onclick="show('exe',this)">Executive</button><button onclick="show('mkt',this)">Marketing</button><button onclick="show('fun',this)">Funnel</button><button onclick="show('cou',this)">Countries</button><button onclick="show('mar',this)">Market</button><button onclick="show('dq',this)">Data Quality</button>
 </div>
 <div class="wrap">
 
-<section id="exe" class="page on"><h1>Executive overview</h1><div class="sub">YFU performance, recruitment and market context</div>
+<section id="exe" class="page on"><h1>Executive overview</h1><div class="sub">YFU recruitment performance and market context &middot; all figures validated on real data</div>
 <div class="grid">
-<div class="card kpi"><div class="klabel">Total Participants</div><div class="value">—</div><div class="note">Partial</div></div>
-<div class="card kpi"><div class="klabel">Recruitment Success Rate</div><div class="value">—</div><div class="note">Partial</div></div>
-<div class="card kpi"><div class="klabel">Withdrawal Rate</div><div class="value">—</div><div class="note">Partial</div></div>
-<div class="card kpi"><div class="klabel">YFU Market Share</div><div class="value">8.1%</div><div class="note">2024/25</div></div>
-<div class="card kpi"><div class="klabel">Market Size</div><div class="value">9,233</div><div class="note">2024/25</div></div>
-<div class="card wide"><div class="title">YFU vs Market Growth</div><div class="muted">Available market periods</div><canvas id="eg"></canvas></div>
-<div class="card wide"><div class="title">Market Snapshot</div><div class="muted">2024/25</div><canvas id="es"></canvas></div>
+<div class="card kpi"><div class="klabel">Final Participants</div><div class="value">4,091<span class="trend up">▲ +4.2%</span></div><div class="note">Contracts Signed − post-signature Withdrawals, 2026/27 vs. 2025/26</div></div>
+<div class="card kpi"><div class="klabel">Overall Funnel Conversion</div><div class="value">13.02%</div><div class="note">Final Participants ÷ Registrations (31,423)</div></div>
+<div class="card kpi"><div class="klabel">Recruitment Success Rate</div><div class="value">26.20%</div><div class="note">Contracts Signed ÷ Applications Submitted</div></div>
+<div class="card kpi orange"><div class="klabel">Withdrawal Rate</div><div class="value">9.53%</div><div class="note">431 of 4,522 signed contracts</div></div>
+<div class="card kpi darkblue"><div class="klabel">Market Size (Gesamtmarkt)</div><div class="value">9,287</div><div class="note">2024/25 &middot; all organisations, corrected figure</div></div>
+<div class="card kpi darkblue"><div class="klabel">YFU Market Share</div><div class="value">8.67%<span class="trend up">▲ +1.2pt</span></div><div class="note">vs 7.44% in 2022/23</div></div>
+<div class="card kpi darkblue"><div class="klabel">Market Change</div><div class="value">−9.89%<span class="trend down">▼</span></div><div class="note">Overall market, 2022/23 → 2024/25</div></div>
+<div class="card kpi darkblue"><div class="klabel">YFU Change</div><div class="value">+4.95%<span class="trend up">▲</span></div><div class="note">YFU growing while the market shrinks</div></div>
+
+<div class="card wide"><div class="title">Final Participants by season</div><div class="muted">EXE-001 &middot; 2027/28 excluded (season in progress)</div><canvas id="eg"></canvas></div>
+<div class="card wide"><div class="title">YFU vs. Overall Market Change</div><div class="muted">2022/23 → 2024/25 &middot; Gesamtmarktdaten</div><canvas id="es"></canvas></div>
 </div></section>
 
-<section id="mkt" class="page"><h1>Marketing</h1><div class="sub">Awareness and outreach performance</div><div class="filters"><select><option>Period: Monthly</option></select><select><option>Platform: All</option></select></div>
+<section id="mkt" class="page"><h1>Marketing</h1><div class="sub">Awareness, Interest, Consideration &amp; the handover into Registration</div>
 <div class="grid">
-<div class="card kpi"><div class="klabel">Social Reach</div><div class="value">—</div><div class="note">Instagram · TikTok · YouTube Shorts</div></div><div class="card kpi"><div class="klabel">Instagram Engagement Rate</div><div class="value">—</div><div class="note">Ready</div></div><div class="card kpi"><div class="klabel">Website Users</div><div class="value">—</div><div class="note">GA</div></div><div class="card kpi"><div class="klabel">Search Impressions</div><div class="value">—</div><div class="note">Search Console</div></div><div class="card kpi"><div class="klabel">Email Deliveries</div><div class="value">—</div><div class="note">CleverReach</div></div><div class="card kpi"><div class="klabel">Brochure Downloads</div><div class="value">—</div><div class="note">GA</div></div>
-<div class="card wide"><div class="title">Social Reach by Platform</div><div class="muted">Illustrative layout — real analytics values to be connected</div><canvas id="sm"></canvas></div><div class="card wide"><div class="title">Website Traffic by Source</div><div class="muted">GA4 concept</div><canvas id="tr"></canvas></div>
-<div class="card full"><div class="note"><b>Awareness:</b> intentionally not combined here. Definition is still to be decided with Marketing (social reach vs Search Console impressions).</div></div>
+<div class="sectionhead">Awareness</div>
+<div class="card kpi teal"><div class="klabel">Social Reach</div><div class="value">140K<span class="badge b-teal">target</span></div><div class="note">Q3 target &middot; Instagram/Facebook/TikTok</div></div>
+<div class="card kpi teal"><div class="klabel">Social Impressions</div><div class="value">210K<span class="badge b-teal">target</span></div><div class="note">Q3 target</div></div>
+<div class="card kpi teal"><div class="klabel">Email Deliveries</div><div class="value">12,560</div><div class="note">Spring + autumn campaigns (CleverReach)</div></div>
+<div class="card kpi teal"><div class="klabel">Letters Sent</div><div class="value">6,099</div><div class="note">Spring + autumn campaigns</div></div>
+<div class="card kpi teal"><div class="klabel">Schulausschreibung Volume</div><div class="value">18,659</div><div class="note">Emails + letters combined (AWR-007)</div></div>
+<div class="card kpi teal"><div class="klabel">School Event Count</div><div class="value">41</div><div class="note">Season 2027/28, entered manually</div></div>
+
+<div class="card wide"><div class="title">Social Reach by Platform — example split</div><div class="muted badge b-teal" style="display:inline-block">illustrative</div><div class="muted">Breakdown of the 140K Q3 target &middot; real per-platform data pending API connection</div><canvas id="soc"></canvas></div>
+<div class="card wide"><div class="title">Outreach Volume — Email vs. Letter</div><div class="muted">AWR-004 / AWR-005, spring + autumn campaigns &middot; real figures</div><canvas id="sm"></canvas></div>
+
+<div class="sectionhead">Interest &amp; Consideration</div>
+<div class="card kpi teal"><div class="klabel">Instagram Engagement Rate</div><div class="value">12.5%<span class="badge b-teal">target</span></div><div class="note">Q3 target</div></div>
+<div class="card kpi teal"><div class="klabel">Website Users</div><div class="value">8,400<span class="badge b-teal">illustrative</span></div><div class="note">Example monthly value — GA4 connection pending</div></div>
+<div class="card kpi teal"><div class="klabel">Website Sessions</div><div class="value">11,200<span class="badge b-teal">illustrative</span></div><div class="note">Example monthly value — GA4 connection pending</div></div>
+<div class="card kpi teal"><div class="klabel">Webinar Participants</div><div class="value">514</div><div class="note">28 Jul – 15 Sept 2026 &middot; real figure</div></div>
+<div class="card kpi orange"><div class="klabel">Brochure Orders</div><div class="value">86<span class="badge b-orange">illustrative</span></div><div class="note">Example monthly value — Partial, pending Intranet export query</div></div>
+
+<div class="card wide"><div class="title">Website Users &amp; Sessions — example trend</div><div class="muted badge b-teal" style="display:inline-block">illustrative</div><div class="muted">Monthly shape example &middot; real GA4 values to be connected</div><canvas id="web"></canvas></div>
+<div class="card wide"><div class="title">Registrations by Channel</div><div class="muted">REG-002 &middot; self-reported "wie hast du von YFU erfahren", all seasons &middot; real figures</div><canvas id="ch"></canvas></div>
 </div></section>
 
-<section id="fun" class="page"><h1>Funnel</h1><div class="sub">Registration → application → contract journey</div><div class="filters"><select><option>Year: 2024/25</option></select><select><option>Destination: All</option></select><select><option>Programme: All</option></select><select><option>Bundesland: All</option></select><select><option>Channel: All</option></select></div>
-<div class="grid"><div class="card wide"><div class="title">Funnel Overview</div><div class="muted">Illustrative shape; exact values require validated Intranet export</div><div class="funnel"><div class="step s1"><span>Registrations</span><span>—</span></div><div class="step s2"><span>Applications</span><span>—</span></div><div class="step s3"><span>Contracts Sent</span><span>—</span></div><div class="step s4"><span>Contracts Signed</span><span>—</span></div><div class="step s5"><span>Withdrawals</span><span>—</span></div><div class="step s6"><span>Final Participants</span><span>—</span></div></div></div>
-<div class="card wide"><div class="title">Conversion & Completion</div><table><tr><th>KPI</th><th>Status</th></tr><tr><td>Registration-to-Application Conversion Rate</td><td><span class="status ok">READY</span></td></tr><tr><td>Introduction Meeting Attendance</td><td><span class="status ok">READY</span></td></tr><tr><td>Introduction Meeting Attendance Rate</td><td><span class="status ok">READY</span></td></tr><tr><td>Parent Consent Forms</td><td><span class="status watch">PARTIAL</span></td></tr><tr><td>Application Completion Rate</td><td><span class="status watch">PARTIAL</span></td></tr><tr><td>Contract Acceptance Rate</td><td><span class="status watch">PARTIAL</span></td></tr><tr><td>Withdrawal Rate (Contract)</td><td><span class="status watch">PARTIAL</span></td></tr></table></div></div></section>
+<section id="fun" class="page"><h1>Funnel</h1><div class="sub">Registration → Application → Contract → Final Participant, all seasons combined (2022/23–2027/28) &middot; real figures throughout</div><div class="filters"><select><option>Destination: All</option></select><select><option>Programme: All</option></select><select><option>Bundesland: All</option></select><select><option>Channel: All</option></select></div>
+<div class="grid"><div class="card wide"><div class="title">Funnel Overview</div><div class="muted">Real figures &middot; YFU Intranet export, person-level</div><div class="funnel">
+<div class="step s1"><span>Registrations<small>REG-001</small></span><span>31,423 <span class="arrow">100%</span></span></div>
+<div class="step s2"><span>Applications<small>APP-001</small></span><span>17,261 <span class="arrow">54.9%</span></span></div>
+<div class="step s3"><span>Contracts Sent<small>CTR-001</small></span><span>6,116 <span class="arrow">19.5%</span></span></div>
+<div class="step s4"><span>Contracts Signed<small>CTR-002</small></span><span>4,522 <span class="arrow">73.9% of sent</span></span></div>
+<div class="step s5"><span>Withdrawals (post-signature)<small>CTR-004</small></span><span>431 <span class="arrow">9.5% of signed</span></span></div>
+<div class="step s6"><span>Final Participants<small>CTR-005</small></span><span>4,091 <span class="arrow">13.0% of Registrations</span></span></div>
+</div></div>
+<div class="card wide"><div class="title">Conversion &amp; Completion — all Ready</div><table><tr><th>KPI</th><th>Value</th><th>Status</th></tr>
+<tr><td>Registration-to-Application Conversion Rate (APP-006)</td><td>54.9%</td><td><span class="status ok">READY</span></td></tr>
+<tr><td>Application Completion Rate (APP-003)</td><td>72.24%</td><td><span class="status ok">READY</span></td></tr>
+<tr><td>Introduction Meeting Attendance Rate (APP-005)</td><td>rate KPI</td><td><span class="status ok">READY</span></td></tr>
+<tr><td>Contract Acceptance Rate (CTR-003)</td><td>73.94%</td><td><span class="status ok">READY</span></td></tr>
+<tr><td>Withdrawal Rate (CTR-006)</td><td>9.53%</td><td><span class="status ok">READY</span></td></tr>
+<tr><td>Overall Funnel Conversion Rate (EXE-002)</td><td>13.02%</td><td><span class="status ok">READY</span></td></tr>
+<tr><td>Recruitment Success Rate (EXE-003)</td><td>26.20%</td><td><span class="status ok">READY</span></td></tr>
+</table></div></div></section>
 
-<section id="cou" class="page"><h1>Countries</h1><div class="sub">Registration, application and participant views by destination</div><div class="filters"><select><option>Year: 2024/25</option></select><select><option>Destination: All</option></select></div>
-<div class="grid"><div class="card wide"><div class="title">Demand Trend by Destination</div><div class="muted">Market data · available periods</div><canvas id="ct"></canvas></div><div class="card wide"><div class="title">Top Destinations — 2024/25</div><div class="muted">Market volume</div><canvas id="cb"></canvas></div></div></section>
+<section id="cou" class="page"><h1>Countries</h1><div class="sub">Demand by destination &middot; Gesamtmarktdaten, two reliable comparison years &middot; real figures</div><div class="filters"><select><option>Compare: 2022/23 vs 2024/25</option></select></div>
+<div class="grid"><div class="card wide"><div class="title">Top 5 Destinations — ranked, 2024/25</div><div class="muted">MKT-005 &middot; all organisations</div><canvas id="ct"></canvas></div>
+<div class="card wide"><div class="title">Destination Share — 2024/25</div><div class="muted">Volume, all organisations</div><canvas id="cb"></canvas></div>
+<div class="card full"><div class="note"><b>Note:</b> New Zealand is the only major destination that grew between 2022/23 and 2024/25 (676 → 942). USA and Canada remain the largest destinations but both declined over the same period. Application- and Participant-level destination breakdowns (APP-001, CTR-005 — YFU-specific, not market-wide) will populate here once per-country figures are extracted from the Intranet export.</div></div>
+</div></section>
 
-<section id="mar" class="page"><h1>Market</h1><div class="sub">SQ2 · Overall market development and YFU position</div>
-<div class="grid"><div class="card kpi"><div class="klabel">Market Size</div><div class="value">9,233</div><div class="note">2024/25</div></div><div class="card kpi"><div class="klabel">Market Growth</div><div class="value">−10.4%</div><div class="note">2022/23 → 2024/25</div></div><div class="card kpi"><div class="klabel">YFU Market Share</div><div class="value">8.1%</div><div class="note">2024/25</div></div><div class="card kpi"><div class="klabel">YFU Growth</div><div class="value">−2.1%</div><div class="note">2022/23 → 2024/25</div></div>
-<div class="card wide"><div class="title">Market Size vs YFU Volume</div><div class="muted">Gesamtmarktdaten</div><canvas id="mv"></canvas></div><div class="card wide"><div class="title">YFU Market Share</div><div class="muted">YFU ÷ market total</div><canvas id="ms"></canvas></div><div class="card full"><div class="title">Demand Trend by Destination Country</div><div class="muted">Gesamtmarktdaten</div><canvas id="mc"></canvas></div>
-<div class="card full"><div class="title">Programme Mix — JP/SP/TP (MKT-006)</div><div class="muted">AJA dataset · all organisations except aubiko, Volunta, Rotary</div><canvas id="pm"></canvas></div>
-<div class="card full"><div class="note"><b>Ready in KPI Dictionary v3.1.</b> MKT-001 to 005 confirmed on Gesamtmarktdaten (2022/23 → 2024/25). MKT-006 reactivated on AJA data. MKT-007 rejected by data owner, removed from dashboard.</div></div></div></section>
+<section id="mar" class="page"><h1>Market</h1><div class="sub">SQ2 &middot; Overall market development and YFU's position — Gesamtmarkt and AJA (nonprofit) views side by side &middot; real figures throughout</div>
+<div class="grid">
+<div class="sectionhead">Gesamtmarkt — the whole German exchange market</div>
+<div class="card kpi darkblue"><div class="klabel">Market Size</div><div class="value">9,287</div><div class="note">2024/25 &middot; corrected (YFU incl. PPP programmes)</div></div>
+<div class="card kpi darkblue"><div class="klabel">Market Change</div><div class="value">−9.89%</div><div class="note">2022/23 → 2024/25</div></div>
+<div class="card kpi darkblue"><div class="klabel">YFU Market Share</div><div class="value">8.67%</div><div class="note">2024/25</div></div>
+<div class="card kpi darkblue"><div class="klabel">YFU Change</div><div class="value">+4.95%</div><div class="note">YFU growing while the market shrinks</div></div>
+<div class="card wide"><div class="title">Market Size vs. YFU Volume</div><div class="muted">Gesamtmarktdaten, 2022/23 → 2024/25</div><canvas id="mv"></canvas></div>
+<div class="card wide"><div class="title">YFU Market Share</div><div class="muted">YFU ÷ market total</div><canvas id="ms"></canvas></div>
 
-<section id="dq" class="page"><h1>Data Quality</h1><div class="sub">Known issues, ownership and conclusions per data source</div><div class="card"><table><tr><th>Data Source</th><th>Feeds</th><th>Known Issue</th><th>Data Owner</th><th>Conclusion</th></tr>
-<tr><td>YFU Intranet</td><td>04_Registration, 05_Application, 06_Contract, 01_Awareness (AWR-006), 03_Consideration (CON-003)</td><td>Two separate withdrawal-date fields (before selection vs. after signature) not yet disambiguated in CTR-004; several exports still marked „später" (not yet delivered).</td><td>Veronica</td><td>To be confirmed with Veronica</td></tr>
-<tr><td>Google Analytics (GA4)</td><td>02_Interest, 03_Consideration (CON-004)</td><td>No major issue currently flagged.</td><td>Maike</td><td>No issue</td></tr>
-<tr><td>Google Search Console</td><td>01_Awareness (AWR-003)</td><td>No major issue currently flagged.</td><td>Maike</td><td>No issue</td></tr>
-<tr><td>Social Media Analytics (Instagram/Facebook/TikTok)</td><td>01_Awareness, 02_Interest (INT-004)</td><td>Currently collected via manual export; API/connector-based collection confirmed feasible, switch planned.</td><td>Miriam</td><td>Decided — API switch planned</td></tr>
-<tr><td>CleverReach</td><td>01_Awareness (AWR-004)</td><td>Bundesland breakdown only available from the next mailing campaign onward — no historical regional data.</td><td>Maike, Adrian</td><td>To be confirmed</td></tr>
-<tr><td>Mailing file / Steuerdatei (Letters Sent)</td><td>01_Awareness (AWR-005)</td><td>Source name inconsistent across documents („Mailing Database" vs. „Steuerdatei") — to confirm which is correct. Bundesland breakdown forward-looking only.</td><td>Maike, Adrian</td><td>To be confirmed (name check)</td></tr>
-<tr><td>Market data — Gesamtmarktdaten</td><td>08_Market (MKT-001 to MKT-005)</td><td>Only two reliable years available (2022/23, 2024/25); one ambiguous dual-value cell for YFU 2024/25 ("751 (häufiger)/752") resolved by taking the first figure (751).</td><td>Veronica</td><td>Confirmed and applied — MKT-001 to 005 validated on Gesamtmarktdaten (2022/23 → 2024/25).</td></tr>
-<tr><td>Market data — AJA dataset</td><td>08_Market (MKT-006)</td><td>RJD (competitor) rarely reports country/state breakdown, a known gap documented in AJA's own "inkonsistenzen" tab. Aubiko, Volunta and Rotary excluded from Programme Mix per data owner instruction.</td><td>Veronica</td><td>MKT-006 (Programme Mix JP/SP/TP) reactivated using the full 9-year AJA history, confirmed with exclusions applied.</td></tr>
-<tr><td>Manual tracking sheets (Webinars, School Events, Brochures)</td><td>01_Awareness (AWR-006), 03_Consideration (CON-001, CON-003)</td><td>Several metrics depend on a dedicated Intranet export query not yet set up; CON-001 webinar attendance only reliable from 2027 onward.</td><td>Veronica</td><td>To be set up</td></tr>
+<div class="sectionhead">AJA — nonprofit/associative exchange organisations only</div>
+<div class="card kpi orange"><div class="klabel">Market Size (AJA)</div><div class="value">3,158</div><div class="note">2025/26 &middot; excl. aubiko, Volunta, Rotary</div></div>
+<div class="card kpi orange"><div class="klabel">Market Change (AJA)</div><div class="value">+10.8%</div><div class="note">2024/25 → 2025/26</div></div>
+<div class="card kpi orange"><div class="klabel">YFU Market Share (AJA)</div><div class="value">33.76%</div><div class="note">2025/26 &middot; up from 30.72% in 2017/18</div></div>
+<div class="card kpi orange"><div class="klabel">YFU Change (AJA)</div><div class="value">+32.4%</div><div class="note">2024/25 → 2025/26, vs +10.8% market</div></div>
+<div class="card wide"><div class="title">Total Market Size — AJA (9-year history)</div><div class="muted">MKT-008 &middot; sending, excl. aubiko/Volunta/Rotary</div><canvas id="aja1"></canvas></div>
+<div class="card wide"><div class="title">YFU Market Share — AJA (9-year history)</div><div class="muted">MKT-010 &middot; consistently 3–4× higher than the Gesamtmarkt share</div><canvas id="aja2"></canvas></div>
+
+<div class="sectionhead">Destination &amp; Programme Mix</div>
+<div class="card full"><div class="title">Demand Trend by Destination Country (Gesamtmarkt)</div><div class="muted">MKT-005</div><canvas id="mc"></canvas></div>
+<div class="card full"><div class="title">Programme Mix — JP / SP / TP (AJA)</div><div class="muted">MKT-006 &middot; all AJA organisations except aubiko, Volunta and Rotary</div><canvas id="pm"></canvas></div>
+<div class="card full"><div class="note"><b>Why two market shares?</b> Gesamtmarktdaten covers every organisation in the German exchange market, so YFU's share there (8.67%) reflects its position across the whole market. The AJA dataset covers only nonprofit/associative organisations — a smaller, more comparable peer group — where YFU's share (33.76%) is much higher. Both are correct; they answer different questions, so they should never be mixed into a single "market share" number. <b>MKT-007</b> (YFU Total Students Sent, historical volume) was rejected by the data owner as duplicating CTR-005/EXE-001 and is kept in the Catalogue for reference only — it does not appear on this dashboard.</div></div>
+</div></section>
+
+<section id="dq" class="page"><h1>Data Quality</h1><div class="sub">Source status, ownership and open points &middot; one row per feeding data source</div><div class="card"><table><tr><th>Data Source</th><th>Feeds</th><th>Known Issue</th><th>Owner</th><th>Conclusion</th></tr>
+<tr><td>YFU Intranet</td><td>04_Registration, 05_Application, 06_Contract, 01_Awareness (AWR-006), 03_Consideration (CON-003)</td><td>—</td><td>Veronica</td><td>—</td></tr>
+<tr><td>Google Analytics (GA4)</td><td>02_Interest, 03_Consideration (CON-004)</td><td>—</td><td>Maike</td><td>—</td></tr>
+<tr><td>Google Search Console</td><td>01_Awareness (AWR-003)</td><td>—</td><td>Maike</td><td>—</td></tr>
+<tr><td>Social Media Analytics (Instagram/Facebook/TikTok)</td><td>01_Awareness, 02_Interest (INT-004)</td><td>Currently collected via manual export; API/connector-based collection has been confirmed as feasible, switch planned.</td><td>Miriam</td><td><span class="badge b-teal">Decided — API switch planned</span></td></tr>
+<tr><td>CleverReach</td><td>01_Awareness (AWR-004)</td><td>Bundesland breakdown only available from the next mailing campaign onward — no historical regional data.</td><td>Maike, Adrian</td><td>—</td></tr>
+<tr><td>Mailing file / Steuerdatei (Letters Sent)</td><td>01_Awareness (AWR-005)</td><td>Source name inconsistent across documents ("Mailing Database" here vs. "Steuerdatei" in the tracking sheet) — to confirm which is correct. Bundesland breakdown forward-looking only.</td><td>Maike, Adrian</td><td><span class="badge b-purple">To be confirmed (name check)</span></td></tr>
+<tr><td>Market data — Gesamtmarktdaten</td><td>08_Market (MKT-001 to MKT-007)</td><td>—</td><td>Thomas</td><td>—</td></tr>
+<tr><td>Market data — AJA dataset</td><td>08_Market (MKT-008 to MKT-011)</td><td>—</td><td>Thomas</td><td>—</td></tr>
+<tr><td>Manual tracking sheets (Webinars, School Events, Brochures)</td><td>01_Awareness (AWR-006), 03_Consideration (CON-001, CON-003)</td><td>—</td><td>Veronica</td><td><span class="badge b-orange">CON-003 still pending</span></td></tr>
 </table></div></section>
 </div>
 <script>
 function show(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on');b.classList.add('on')}
-const L=['2017/18','2018/19','2022/23','2024/25'], O={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true},x:{grid:{display:false}}}};
-function line(id,ds){new Chart(document.getElementById(id),{type:'line',data:{labels:L,datasets:ds},options:O})}
-function bar(id,l,v){new Chart(document.getElementById(id),{type:'bar',data:{labels:l,datasets:[{label:'Participants',data:v,borderRadius:5}]},options:O})}
-line('eg',[{label:'Market growth %',data:[null,-9.5,8.6,-10.4],tension:.25},{label:'YFU growth %',data:[null,1.4,-16.2,-2.1],tension:.25}]);
-new Chart(document.getElementById('es'),{type:'doughnut',data:{labels:['YFU','Other organisations'],datasets:[{data:[8.1,91.9]}]},options:{plugins:{legend:{position:'bottom'}}}});
-bar('sm',['Instagram','TikTok','YouTube Shorts'],[0,0,0]);bar('tr',['Organic','Direct','Referral','Other'],[0,0,0,0]);
-line('ct',[{label:'USA',data:[4285,3734,3966,3440],tension:.25},{label:'Canada',data:[1414,1619,2734,2105],tension:.25},{label:'New Zealand',data:[821,897,676,942],tension:.25},{label:'Ireland',data:[641,600,585,425],tension:.25},{label:'UK',data:[769,735,387,290],tension:.25},{label:'Australia',data:[600,557,472,410],tension:.25}]);
-bar('cb',['USA','Canada','New Zealand','Ireland','UK','Australia'],[3440,2105,942,425,290,410]);
-line('mv',[{label:'Market size',data:[10478,9486,10306,9233],tension:.25},{label:'YFU students sent',data:[902,915,767,751],tension:.25}]);
-line('ms',[{label:'YFU market share %',data:[8.6,9.6,7.4,8.1],tension:.25}]);
-line('mc',[{label:'USA',data:[4285,3734,3966,3440],tension:.25},{label:'Canada',data:[1414,1619,2734,2105],tension:.25},{label:'New Zealand',data:[821,897,676,942],tension:.25}]);
-new Chart(document.getElementById('pm'),{type:'bar',data:{labels:['2017/18','2018/19','2019/20','2020/21','2021/22','2022/23','2023/24','2024/25','2025/26'],datasets:[{label:'JP',data:[2659,2661,2397,453,1703,2208,2115,2268,2517],borderRadius:5},{label:'SP',data:[274,272,320,231,451,553,505,581,527],borderRadius:5},{label:'TP',data:[0,0,0,0,0,0,0,0,114],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true,stacked:true},x:{stacked:true,grid:{display:false}}}}});
-</script></body></html>
+const O={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'#f0ecf1'}},x:{grid:{display:false}}}};
+/* Official YFU secondary palette, in swatch order: Study Abroad, Host a Student, Volunteer, Educators, Alumni, Donors */
+const palette=['#00B4B9','#F59100','#E6004B','#0AAFE6','#C3D74B','#005A82'];
+
+new Chart(document.getElementById('eg'),{type:'line',data:{labels:['2022/23','2023/24','2024/25','2025/26','2026/27'],datasets:[{label:'Final Participants',data:[760,683,808,742,773],borderColor:'#642869',backgroundColor:'rgba(100,40,105,.12)',tension:.3,fill:true}]},options:O});
+
+new Chart(document.getElementById('es'),{type:'bar',data:{labels:['Overall Market','YFU'],datasets:[{label:'Change 2022/23 → 2024/25 (%)',data:[-9.89,4.95],backgroundColor:['#E6004B','#C3D74B'],borderRadius:6}]},options:O});
+
+new Chart(document.getElementById('soc'),{type:'doughnut',data:{labels:['Instagram (example)','TikTok (example)','Facebook (example)'],datasets:[{data:[65000,45000,30000],backgroundColor:['#00B4B9','#F59100','#0AAFE6']}]},options:{plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});
+
+new Chart(document.getElementById('sm'),{type:'bar',data:{labels:['Email Deliveries','Letters Sent'],datasets:[{label:'Volume',data:[12560,6099],backgroundColor:['#00B4B9','#F59100'],borderRadius:6}]},options:O});
+
+new Chart(document.getElementById('web'),{type:'line',data:{labels:['Apr','May','Jun','Jul','Aug','Sep'],datasets:[
+ {label:'Users (example)',data:[6200,6800,7100,7600,8000,8400],borderColor:'#00B4B9',backgroundColor:'rgba(0,180,185,.12)',fill:true,tension:.3},
+ {label:'Sessions (example)',data:[8100,8900,9300,9900,10500,11200],borderColor:'#0AAFE6',backgroundColor:'rgba(10,175,230,.10)',fill:true,tension:.3}]},options:O});
+
+new Chart(document.getElementById('ch'),{type:'bar',data:{labels:['Webseite','PPP-Online','E-Mail','AJA','PPP-Meldekarte','Telefon','App'],datasets:[{label:'Registrations',data:[23351,6831,382,250,199,174,144],backgroundColor:'#00B4B9',borderRadius:5}]},options:{...O,scales:{...O.scales,y:{...O.scales.y,type:'logarithmic'}}}});
+
+new Chart(document.getElementById('ct'),{type:'bar',data:{labels:['USA','Canada','New Zealand','Ireland','Australia'],datasets:[
+ {label:'2022/23',data:[3966,2734,676,585,472],backgroundColor:'#d8cbdb',borderRadius:4},
+ {label:'2024/25',data:[3440,2105,942,425,410],backgroundColor:'#642869',borderRadius:4}]},options:{indexAxis:'y',...O}});
+
+new Chart(document.getElementById('cb'),{type:'doughnut',data:{labels:['USA','Canada','New Zealand','Ireland','Australia'],datasets:[{d
