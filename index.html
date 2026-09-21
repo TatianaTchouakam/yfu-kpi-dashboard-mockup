@@ -238,4 +238,26 @@ new Chart(document.getElementById('ct'),{type:'bar',data:{labels:['USA','Canada'
  {label:'2022/23',data:[3966,2734,676,585,472],backgroundColor:'#d8cbdb',borderRadius:4},
  {label:'2024/25',data:[3440,2105,942,425,410],backgroundColor:'#642869',borderRadius:4}]},options:{indexAxis:'y',...O}});
 
-new Chart(document.getElementById('cb'),{type:'doughnut',data:{labels:['USA','Canada','New Zealand','Ireland','Australia'],datasets:[{d
+new Chart(document.getElementById('cb'),{type:'doughnut',data:{labels:['USA','Canada','New Zealand','Ireland','Australia'],datasets:[{data:[3440,2105,942,425,410],backgroundColor:palette}]},options:{plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});
+
+new Chart(document.getElementById('mv'),{type:'line',data:{labels:['2022/23','2024/25'],datasets:[
+ {label:'Market size (Gesamtmarkt)',data:[10306,9287],borderColor:'#005A82',backgroundColor:'rgba(0,90,130,.12)',fill:true,tension:.2},
+ {label:'YFU volume',data:[767,805],borderColor:'#642869',backgroundColor:'rgba(100,40,105,.12)',fill:true,tension:.2}]},options:O});
+
+new Chart(document.getElementById('ms'),{type:'line',data:{labels:['2022/23','2024/25'],datasets:[{label:'YFU market share %',data:[7.44,8.67],borderColor:'#642869',backgroundColor:'rgba(100,40,105,.15)',fill:true,tension:.2}]},options:O});
+
+const ajaYears=['2017/18','2018/19','2019/20','2020/21','2021/22','2022/23','2023/24','2024/25','2025/26'];
+new Chart(document.getElementById('aja1'),{type:'bar',data:{labels:ajaYears,datasets:[{label:'Market Size (AJA)',data:[2933,2933,2717,684,2154,2761,2620,2849,3158],backgroundColor:'#F59100',borderRadius:5}]},options:O});
+
+new Chart(document.getElementById('aja2'),{type:'line',data:{labels:ajaYears,datasets:[{label:'YFU Market Share (AJA) %',data:[30.72,31.20,31.87,24.56,28.64,27.78,26.15,28.26,33.76],borderColor:'#C3D74B',backgroundColor:'rgba(195,215,75,.25)',fill:true,tension:.25}]},options:O});
+
+new Chart(document.getElementById('mc'),{type:'line',data:{labels:['2022/23','2024/25'],datasets:[
+ {label:'USA',data:[3966,3440],borderColor:'#00B4B9',tension:.2},
+ {label:'Canada',data:[2734,2105],borderColor:'#0AAFE6',tension:.2},
+ {label:'New Zealand',data:[676,942],borderColor:'#C3D74B',tension:.2}]},options:O});
+
+new Chart(document.getElementById('pm'),{type:'bar',data:{labels:ajaYears,datasets:[
+ {label:'JP',data:[2659,2661,2397,453,1703,2208,2115,2268,2517],backgroundColor:'#642869',borderRadius:4},
+ {label:'SP',data:[274,272,320,231,451,553,505,581,527],backgroundColor:'#00B4B9',borderRadius:4},
+ {label:'TP',data:[0,0,0,0,0,0,0,0,114],backgroundColor:'#F59100',borderRadius:4}]},options:{...O,scales:{y:{beginAtZero:true,stacked:true,grid:{color:'#f0ecf1'}},x:{stacked:true,grid:{display:false}}}}});
+</script></body></html>
