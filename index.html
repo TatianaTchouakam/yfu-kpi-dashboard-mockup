@@ -68,6 +68,13 @@ canvas{max-height:270px}
 .sectionhead::after{content:"";flex:1;height:1px;background:var(--line)}
 .funnel{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 0}
 .step{color:#fff;display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-radius:8px;font-size:12.5px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.target-line{position:relative;height:6px;background:#eee;border-radius:4px;margin-top:10px}
+.target-line .bar{position:absolute;top:0;left:0;height:100%;border-radius:4px}
+.target-line .mark{position:absolute;top:-4px;width:2px;height:14px;background:#333}
+.mapwrap{position:relative;width:100%;aspect-ratio:16/8;background:linear-gradient(180deg,#eef3f6,#e4ecf1);border-radius:10px;overflow:hidden}
+.blob{position:absolute;background:#d7dfe4;border-radius:40% 60% 55% 45%/50% 45% 55% 50%}
+.marker{position:absolute;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:10px;box-shadow:0 2px 8px rgba(0,0,0,.18);border:2px solid #fff}
+.maplabel{position:absolute;font-size:10.5px;font-weight:700;color:var(--ink);white-space:nowrap;transform:translate(-50%,4px)}
 .step small{display:block;font-weight:600;opacity:.85;font-size:10.5px;margin-top:2px}
 .s1{width:96%;background:linear-gradient(90deg,#642869,#7d3d84)}
 .s2{width:74%;background:linear-gradient(90deg,#7d3d84,#0AAFE6)}
@@ -98,12 +105,12 @@ tr:hover td{background:#faf8fb}
   <div class="head-row">
     <div>
       <b>YFU &middot; Recruitment Funnel KPI Dashboard</b>
-      <small>PB1 mockup &middot; KPI Dictionary v3.1 &middot; 21 September 2026</small>
+      <small>PB1 mockup &middot; KPI Dictionary v3.1 &middot; 24 September 2026</small>
     </div>
     <div class="pillbar">
       <div class="pill"><span class="dot" style="background:#c3d74b"></span>43 KPIs total</div>
-      <div class="pill"><span class="dot" style="background:#c3d74b"></span>41 validated</div>
-      <div class="pill"><span class="dot" style="background:#F59100"></span>1 partial</div>
+      <div class="pill"><span class="dot" style="background:#c3d74b"></span>39 validated</div>
+      <div class="pill"><span class="dot" style="background:#F59100"></span>2 partial</div>
       <div class="pill"><span class="dot" style="background:#e6004b"></span>2 rejected</div>
     </div>
   </div>
@@ -116,7 +123,9 @@ tr:hover td{background:#faf8fb}
 
 <section id="exe" class="page on"><h1>Executive overview</h1><div class="sub">YFU recruitment performance and market context &middot; all figures validated on real data</div>
 <div class="grid">
-<div class="card kpi"><div class="klabel">Final Participants</div><div class="value">4,091<span class="trend up">▲ +4.2%</span></div><div class="note">Contracts Signed − post-signature Withdrawals, 2026/27 vs. 2025/26</div></div>
+<div class="card kpi"><div class="klabel">Final Participants</div><div class="value">773<span class="trend up">▲ +4.2%</span></div><div class="note">2026/27 season vs. 2025/26 (742) &middot; target 800</div>
+<div class="target-line"><div class="bar" style="width:96.6%;background:var(--purple)"></div><div class="mark" style="left:100%"></div></div>
+<div class="note" style="margin-top:4px">96.6% of season target (800)</div></div>
 <div class="card kpi"><div class="klabel">Overall Funnel Conversion</div><div class="value">13.02%</div><div class="note">Final Participants ÷ Registrations (31,423)</div></div>
 <div class="card kpi"><div class="klabel">Recruitment Success Rate</div><div class="value">26.20%</div><div class="note">Contracts Signed ÷ Applications Submitted</div></div>
 <div class="card kpi orange"><div class="klabel">Withdrawal Rate</div><div class="value">9.53%</div><div class="note">431 of 4,522 signed contracts</div></div>
@@ -125,7 +134,7 @@ tr:hover td{background:#faf8fb}
 <div class="card kpi darkblue"><div class="klabel">Market Change</div><div class="value">−9.89%<span class="trend down">▼</span></div><div class="note">Overall market, 2022/23 → 2024/25</div></div>
 <div class="card kpi darkblue"><div class="klabel">YFU Change</div><div class="value">+4.95%<span class="trend up">▲</span></div><div class="note">YFU growing while the market shrinks</div></div>
 
-<div class="card wide"><div class="title">Final Participants by season</div><div class="muted">EXE-001 &middot; 2027/28 excluded (season in progress)</div><canvas id="eg"></canvas></div>
+<div class="card wide"><div class="title">Final Participants by season vs. target</div><div class="muted">EXE-001 &middot; target 800/season (CTR-005) &middot; 2027/28 excluded (season in progress)</div><canvas id="eg"></canvas></div>
 <div class="card wide"><div class="title">YFU vs. Overall Market Change</div><div class="muted">2022/23 → 2024/25 &middot; Gesamtmarktdaten</div><canvas id="es"></canvas></div>
 </div></section>
 
@@ -147,7 +156,7 @@ tr:hover td{background:#faf8fb}
 <div class="card kpi teal"><div class="klabel">Website Users</div><div class="value">8,400<span class="badge b-teal">illustrative</span></div><div class="note">Example monthly value — GA4 connection pending</div></div>
 <div class="card kpi teal"><div class="klabel">Website Sessions</div><div class="value">11,200<span class="badge b-teal">illustrative</span></div><div class="note">Example monthly value — GA4 connection pending</div></div>
 <div class="card kpi teal"><div class="klabel">Webinar Participants</div><div class="value">514</div><div class="note">28 Jul – 15 Sept 2026 &middot; real figure</div></div>
-<div class="card kpi orange"><div class="klabel">Brochure Orders</div><div class="value">86<span class="badge b-orange">illustrative</span></div><div class="note">Example monthly value — Partial, pending Intranet export query</div></div>
+<div class="card kpi teal"><div class="klabel">Brochure Orders</div><div class="value">12,207</div><div class="note">Jan 2022 – Sep 2026, real figure &middot; homepage orders only</div></div>
 
 <div class="card wide"><div class="title">Website Users &amp; Sessions — example trend</div><div class="muted badge b-teal" style="display:inline-block">illustrative</div><div class="muted">Monthly shape example &middot; real GA4 values to be connected</div><canvas id="web"></canvas></div>
 <div class="card wide"><div class="title">Registrations by Channel</div><div class="muted">REG-002 &middot; self-reported "wie hast du von YFU erfahren", all seasons &middot; real figures</div><canvas id="ch"></canvas></div>
@@ -172,8 +181,27 @@ tr:hover td{background:#faf8fb}
 <tr><td>Recruitment Success Rate (EXE-003)</td><td>26.20%</td><td><span class="status ok">READY</span></td></tr>
 </table></div></div></section>
 
-<section id="cou" class="page"><h1>Countries</h1><div class="sub">Demand by destination &middot; Gesamtmarktdaten, two reliable comparison years &middot; real figures</div><div class="filters"><select><option>Compare: 2022/23 vs 2024/25</option></select></div>
-<div class="grid"><div class="card wide"><div class="title">Top 5 Destinations — ranked, 2024/25</div><div class="muted">MKT-005 &middot; all organisations</div><canvas id="ct"></canvas></div>
+<section id="cou" class="page"><h1>Countries</h1><div class="sub">Demand by destination &middot; Gesamtmarktdaten, two reliable comparison seasons &middot; real figures</div><div class="filters"><select><option>Compare: 2022/23 vs 2024/25</option></select></div>
+<div class="grid">
+<div class="card full"><div class="title">Destination Map — example layout</div><div class="muted badge b-teal" style="display:inline-block">illustrative layout</div><div class="muted">Bubble size = 2024/25 volume (MKT-005, real figures) &middot; positions approximate, for format review only — a production version would use a proper geo-map visual in Power BI</div>
+<div class="mapwrap">
+<div class="blob" style="left:8%;top:14%;width:34%;height:46%"></div>
+<div class="blob" style="left:44%;top:16%;width:14%;height:22%"></div>
+<div class="blob" style="left:40%;top:40%;width:16%;height:34%"></div>
+<div class="blob" style="left:58%;top:20%;width:26%;height:42%"></div>
+<div class="blob" style="left:76%;top:58%;width:16%;height:24%"></div>
+<div class="marker" style="left:20%;top:36%;width:54px;height:54px;background:#642869" title="USA 3,440">USA</div>
+<div class="maplabel" style="left:20%;top:36%">3,440</div>
+<div class="marker" style="left:21%;top:22%;width:44px;height:44px;background:#00B4B9" title="Canada 2,105">CAN</div>
+<div class="maplabel" style="left:21%;top:22%;margin-top:14px">2,105</div>
+<div class="marker" style="left:47%;top:26%;width:26px;height:26px;background:#0AAFE6" title="Ireland 425">IRL</div>
+<div class="maplabel" style="left:47%;top:26%;margin-top:2px">425</div>
+<div class="marker" style="left:84%;top:70%;width:30px;height:30px;background:#F59100" title="Australia 410">AUS</div>
+<div class="maplabel" style="left:84%;top:70%;margin-top:4px">410</div>
+<div class="marker" style="left:90%;top:82%;width:28px;height:28px;background:#C3D74B;color:#5b6a1a" title="New Zealand 942">NZ</div>
+<div class="maplabel" style="left:90%;top:82%;margin-top:2px">942</div>
+</div></div>
+<div class="card wide"><div class="title">Top 5 Destinations — ranked, 2024/25</div><div class="muted">MKT-005 &middot; all organisations</div><canvas id="ct"></canvas></div>
 <div class="card wide"><div class="title">Destination Share — 2024/25</div><div class="muted">Volume, all organisations</div><canvas id="cb"></canvas></div>
 <div class="card full"><div class="note"><b>Note:</b> New Zealand is the only major destination that grew between 2022/23 and 2024/25 (676 → 942). USA and Canada remain the largest destinations but both declined over the same period. Application- and Participant-level destination breakdowns (APP-001, CTR-005 — YFU-specific, not market-wide) will populate here once per-country figures are extracted from the Intranet export.</div></div>
 </div></section>
@@ -211,7 +239,7 @@ tr:hover td{background:#faf8fb}
 <tr><td>Mailing file / Steuerdatei (Letters Sent)</td><td>01_Awareness (AWR-005)</td><td>Source name inconsistent across documents ("Mailing Database" here vs. "Steuerdatei" in the tracking sheet) — to confirm which is correct. Bundesland breakdown forward-looking only.</td><td>Maike, Adrian</td><td><span class="badge b-purple">To be confirmed (name check)</span></td></tr>
 <tr><td>Market data — Gesamtmarktdaten</td><td>08_Market (MKT-001 to MKT-007)</td><td>—</td><td>Thomas</td><td>—</td></tr>
 <tr><td>Market data — AJA dataset</td><td>08_Market (MKT-008 to MKT-011)</td><td>—</td><td>Thomas</td><td>—</td></tr>
-<tr><td>Manual tracking sheets (Webinars, School Events, Brochures)</td><td>01_Awareness (AWR-006), 03_Consideration (CON-001, CON-003)</td><td>—</td><td>Veronica</td><td><span class="badge b-orange">CON-003 still pending</span></td></tr>
+<tr><td>Manual tracking sheets (Webinars, School Events, Brochures)</td><td>01_Awareness (AWR-006), 03_Consideration (CON-001, CON-003)</td><td>AWR-006 and CON-001 remain "Partially Available" — limited historical depth (single season / Jul–Sep 2026 only), not a data issue.</td><td>Adrian</td><td>—</td></tr>
 </table></div></section>
 </div>
 <script>
@@ -220,7 +248,9 @@ const O={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bo
 /* Official YFU secondary palette, in swatch order: Study Abroad, Host a Student, Volunteer, Educators, Alumni, Donors */
 const palette=['#00B4B9','#F59100','#E6004B','#0AAFE6','#C3D74B','#005A82'];
 
-new Chart(document.getElementById('eg'),{type:'line',data:{labels:['2022/23','2023/24','2024/25','2025/26','2026/27'],datasets:[{label:'Final Participants',data:[760,683,808,742,773],borderColor:'#642869',backgroundColor:'rgba(100,40,105,.12)',tension:.3,fill:true}]},options:O});
+new Chart(document.getElementById('eg'),{type:'line',data:{labels:['2022/23','2023/24','2024/25','2025/26','2026/27'],datasets:[
+ {label:'Final Participants',data:[760,683,808,742,773],borderColor:'#642869',backgroundColor:'rgba(100,40,105,.12)',tension:.3,fill:true},
+ {label:'Target (800)',data:[800,800,800,800,800],borderColor:'#9098a1',borderDash:[6,4],pointRadius:0,fill:false}]},options:O});
 
 new Chart(document.getElementById('es'),{type:'bar',data:{labels:['Overall Market','YFU'],datasets:[{label:'Change 2022/23 → 2024/25 (%)',data:[-9.89,4.95],backgroundColor:['#E6004B','#C3D74B'],borderRadius:6}]},options:O});
 
