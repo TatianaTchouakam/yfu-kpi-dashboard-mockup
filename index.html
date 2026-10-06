@@ -6,288 +6,424 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{
-  /* Official YFU brand palette */
-  --purple:#642869;      /* YFU Royal Purple */
-  --purple2:#7d3d84;
-  --darkblue:#005A82;    /* Donors */
-  --blue:#0AAFE6;        /* Educators */
-  --teal:#00B4B9;        /* Study Abroad */
-  --orange:#F59100;      /* Host a Student */
-  --red:#E6004B;         /* Volunteer */
-  --green:#C3D74B;       /* Alumni */
-  --green-ink:#6b7a1f;   /* Alumni, darkened for text contrast */
-  --ink:#555555;         /* YFU brand text grey */
-  --muted:#7c7c86; --line:#e8e4ea; --bg:#f5f3f6; --grey:#9098a1;
+  /* YFU "sending" palette: purple + turquoise, three shades each */
+  --p1:#642869; --p2:#8e5a93; --p3:#c4a3c8;
+  --t1:#008a8f; --t2:#00B4B9; --t3:#7fd8db;
+  --ink:#555555; --muted:#7c7c86; --line:#e8e4ea; --bg:#f5f3f6; --grey:#9aa0a6;
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--ink)}
-.head{background:linear-gradient(120deg,var(--purple) 0%,#4d2a63 55%,var(--darkblue) 130%);color:#fff;padding:28px 36px;position:relative;overflow:hidden}
+.head{background:linear-gradient(120deg,var(--p1) 0%,#4d2a63 55%,var(--t1) 135%);color:#fff;padding:28px 36px;position:relative;overflow:hidden}
 .head::after{content:"";position:absolute;top:-60%;right:-8%;width:420px;height:420px;background:radial-gradient(circle,rgba(255,255,255,.10) 0%,rgba(255,255,255,0) 70%)}
 .head-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;position:relative;z-index:1}
 .head b{font-size:26px;letter-spacing:.2px}
 .head small{display:block;margin-top:6px;opacity:.85;font-size:12.5px}
 .pillbar{display:flex;gap:10px;flex-wrap:wrap}
-.pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);backdrop-filter:blur(2px);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
+.pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
 .pill .dot{width:7px;height:7px;border-radius:50%}
-.disclaimer{position:relative;z-index:1;margin-top:16px;font-size:11px;opacity:.8;max-width:920px;line-height:1.5}
+.disclaimer{position:relative;z-index:1;margin-top:16px;font-size:11px;opacity:.85;max-width:980px;line-height:1.5}
 .tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);padding-left:25px;overflow:auto;position:sticky;top:0;z-index:5;box-shadow:0 2px 6px rgba(30,10,40,.05)}
-.tabs button{padding:16px 18px;border:0;background:#fff;color:var(--muted);font-weight:700;cursor:pointer;font-size:13.5px;letter-spacing:.2px;border-bottom:3px solid transparent;transition:.15s}
-.tabs button:hover{color:var(--purple)}
-.tabs button.on{color:var(--purple);border-bottom:3px solid var(--purple)}
+.tabs button{padding:16px 18px;border:0;background:#fff;color:var(--muted);font-weight:700;cursor:pointer;font-size:13.5px;border-bottom:3px solid transparent;transition:.15s}
+.tabs button:hover{color:var(--p1)}
+.tabs button.on{color:var(--p1);border-bottom:3px solid var(--p1)}
 .wrap{max-width:1440px;margin:auto;padding:26px}
 .page{display:none;animation:fade .25s ease}
 .page.on{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-h1{margin:0 0 4px;color:var(--purple);font-size:22px}
-.sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+h1{margin:0 0 4px;color:var(--p1);font-size:22px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:16px}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(30,10,40,.05);transition:.18s;position:relative}
-.card:hover{box-shadow:0 8px 20px rgba(30,10,40,.10);transform:translateY(-2px)}
-.kpi{grid-column:span 3;border-top:3px solid var(--purple)}
-.kpi.teal{border-top-color:var(--teal)}
-.kpi.blue{border-top-color:var(--blue)}
-.kpi.orange{border-top-color:var(--orange)}
-.kpi.darkblue{border-top-color:var(--darkblue)}
-.kpi.green{border-top-color:var(--green)}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 1px 2px rgba(30,10,40,.05);position:relative;min-width:0}
+.kpi{grid-column:span 3;border-top:3px solid var(--p1)}
+.kpi.t{border-top-color:var(--t2)}
+.kpi.p2{border-top-color:var(--p2)}
+.kpi.t1{border-top-color:var(--t1)}
 .wide{grid-column:span 6}
-.third{grid-column:span 4}
 .full{grid-column:1/-1}
+.span4{grid-column:span 4}
+.span8{grid-column:span 8}
 .klabel{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
-.value{font-size:27px;font-weight:800;color:var(--purple);margin-top:9px;display:flex;align-items:baseline;gap:8px}
-.trend{font-size:12.5px;font-weight:700;padding:2px 7px;border-radius:8px}
-.up{color:var(--green-ink);background:#f1f5df}
-.down{color:var(--red);background:#fde7ee}
+.klabel .id{color:#b0a8b3;font-weight:600;margin-left:4px}
+.value{font-size:27px;font-weight:800;color:var(--p1);margin-top:9px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.trend{font-size:12px;font-weight:700;padding:2px 7px;border-radius:8px;white-space:nowrap}
+.up{color:#00686c;background:#e0f4f4}
+.down{color:var(--p1);background:#f1e8f2}
 .flat{color:var(--grey);background:#eef1f3}
-.note{font-size:11px;color:#8a8a92;margin-top:8px;line-height:1.4}
-.title{font-weight:800;margin-bottom:2px;color:var(--purple);font-size:14.5px}
-.muted{font-size:11.5px;color:var(--muted);margin-bottom:12px}
-canvas{max-height:270px}
-.filters{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.filters select{padding:9px 12px;border:1px solid #ddd6e0;border-radius:8px;background:#fff;font-size:12.5px;color:var(--ink)}
-.sectionhead{font-size:12px;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:.6px;margin:22px 0 12px;grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.season{display:inline-block;font-size:10.5px;font-weight:700;color:var(--t1);background:#e0f4f4;border-radius:6px;padding:2px 7px;margin-top:6px}
+.note{font-size:11px;color:#8a8a92;margin-top:7px;line-height:1.45}
+.prev{font-size:11.5px;color:#6b6b74;margin-top:6px}
+.title{font-weight:800;margin-bottom:2px;color:var(--p1);font-size:14.5px}
+.muted{font-size:11.5px;color:var(--muted);margin-bottom:10px}
+.chartbox{position:relative;height:270px}
+.filters{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filters label{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.filters select{padding:8px 12px;border:1px solid #ddd6e0;border-radius:8px;background:#fff;font-size:12.5px;color:var(--ink);margin-left:6px}
+.sectionhead{font-size:12px;font-weight:800;color:var(--p1);text-transform:uppercase;letter-spacing:.6px;margin:20px 0 4px;grid-column:1/-1;display:flex;align-items:center;gap:10px}
 .sectionhead::after{content:"";flex:1;height:1px;background:var(--line)}
 .funnel{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 0}
 .step{color:#fff;display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-radius:8px;font-size:12.5px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.08)}
-.target-line{position:relative;height:6px;background:#eee;border-radius:4px;margin-top:10px}
-.target-line .bar{position:absolute;top:0;left:0;height:100%;border-radius:4px}
-.target-line .mark{position:absolute;top:-4px;width:2px;height:14px;background:#333}
-.mapwrap{position:relative;width:100%;aspect-ratio:16/8;background:linear-gradient(180deg,#eef3f6,#e4ecf1);border-radius:10px;overflow:hidden}
+.step small{display:block;font-weight:600;opacity:.85;font-size:10.5px;margin-top:2px}
+.arrow{font-size:10px;opacity:.9;font-weight:700;margin-left:6px}
+.bar{height:7px;background:#eee;border-radius:4px;margin-top:10px;position:relative}
+.bar i{display:block;height:100%;border-radius:4px;background:var(--p1)}
+.bar b{position:absolute;top:-4px;width:2px;height:15px;background:#333}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+td.n,th.n{text-align:right;white-space:nowrap}
+th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:800;position:sticky;top:0;background:#fff}
+tr:hover td{background:#faf8fb}
+.scroll{max-height:420px;overflow:auto}
+.badge{display:inline-block;padding:2px 8px;border-radius:7px;font-size:10.5px;font-weight:700}
+.b-p{background:#f1e8f2;color:var(--p1)}
+.b-t{background:#e0f4f4;color:#017377}
+.b-g{background:#eef1f3;color:#6b7580}
+.mapwrap{position:relative;width:100%;aspect-ratio:16/7;background:linear-gradient(180deg,#eef3f6,#e4ecf1);border-radius:10px;overflow:hidden}
 .blob{position:absolute;background:#d7dfe4;border-radius:40% 60% 55% 45%/50% 45% 55% 50%}
 .marker{position:absolute;border-radius:50%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:10px;box-shadow:0 2px 8px rgba(0,0,0,.18);border:2px solid #fff}
 .maplabel{position:absolute;font-size:10.5px;font-weight:700;color:var(--ink);white-space:nowrap;transform:translate(-50%,4px)}
-.step small{display:block;font-weight:600;opacity:.85;font-size:10.5px;margin-top:2px}
-.s1{width:96%;background:linear-gradient(90deg,#642869,#7d3d84)}
-.s2{width:74%;background:linear-gradient(90deg,#7d3d84,#0AAFE6)}
-.s3{width:44%;background:linear-gradient(90deg,#0AAFE6,#00B4B9)}
-.s4{width:33%;background:linear-gradient(90deg,#00B4B9,#4fae76)}
-.s5{width:31%;background:linear-gradient(90deg,#F59100,#e6004b)}
-.s6{width:30%;background:linear-gradient(90deg,#005A82,#0AAFE6)}
-.arrow{font-size:10px;color:var(--muted);font-weight:700}
-.status{padding:4px 9px;border-radius:12px;font-size:10px;font-weight:800;letter-spacing:.3px}
-.ok{background:#f1f5df;color:#5b6a1a}
-.watch{background:#fff1e0;color:#a05e00}
-.review{background:#fde7ee;color:#a0003a}
-.missing{background:#eceff2;color:#687580}
-table{width:100%;border-collapse:collapse;font-size:12.5px}
-th,td{padding:11px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:800}
-tr:hover td{background:#faf8fb}
-.badge{display:inline-block;padding:2px 8px;border-radius:7px;font-size:10.5px;font-weight:700}
-.b-purple{background:#f1e8f2;color:var(--purple)}
-.b-teal{background:#e0f4f4;color:#017377}
-.b-orange{background:#fff1e0;color:#a05e00}
-.b-red{background:#fde7ee;color:#a0003a}
-@media(max-width:1000px){.kpi{grid-column:span 4}.wide,.third{grid-column:span 6}}
-@media(max-width:640px){.kpi,.wide,.third{grid-column:1/-1}.wrap{padding:14px}.head{padding:22px}}
+@media(max-width:1000px){.kpi{grid-column:span 4}.wide,.span4,.span8{grid-column:span 6}}
+@media(max-width:640px){.kpi,.wide,.span4,.span8{grid-column:1/-1}.wrap{padding:14px}.head{padding:22px}}
 </style></head>
 <body>
 <div class="head">
   <div class="head-row">
     <div>
       <b>YFU &middot; Recruitment Funnel KPI Dashboard</b>
-      <small>PB1 mockup &middot; KPI Dictionary v3.1 &middot; 24 September 2026</small>
+      <small>PB1 mockup &middot; KPI Dictionary v3.1 &middot; 6 October 2026</small>
     </div>
     <div class="pillbar">
-      <div class="pill"><span class="dot" style="background:#c3d74b"></span>43 KPIs total</div>
-      <div class="pill"><span class="dot" style="background:#c3d74b"></span>39 validated</div>
-      <div class="pill"><span class="dot" style="background:#F59100"></span>2 partial</div>
-      <div class="pill"><span class="dot" style="background:#e6004b"></span>2 rejected</div>
+      <div class="pill"><span class="dot" style="background:#7fd8db"></span>43 KPIs total</div>
+      <div class="pill"><span class="dot" style="background:#7fd8db"></span>40 validated</div>
+      <div class="pill"><span class="dot" style="background:#c4a3c8"></span>1 partial</div>
+      <div class="pill"><span class="dot" style="background:#fff"></span>2 rejected</div>
     </div>
   </div>
-    <div class="disclaimer">Mockup layout — Funnel, Contract and Market figures are real. "Illustrative" values and the Countries map are placeholders for sources/visuals not yet connected (GA4, Social Media API, geo-map).</div>
+  <div class="disclaimer">Mockup layout &mdash; Funnel, Contract, Market and manually collected figures are real. Charts and values marked "illustrative" (GA4, social media, Countries map) are placeholders for sources or visuals not yet connected. Seasons follow the YFU programme season (e.g. 2027/28 = recruitment 1 April 2026 &ndash; 31 March 2027, in progress).</div>
 </div>
 <div class="tabs">
 <button class="on" onclick="show('exe',this)">Executive</button><button onclick="show('mkt',this)">Marketing</button><button onclick="show('fun',this)">Funnel</button><button onclick="show('cou',this)">Countries</button><button onclick="show('mar',this)">Market</button><button onclick="show('dq',this)">Data Quality</button>
 </div>
 <div class="wrap">
-
-<section id="exe" class="page on"><h1>Executive overview</h1><div class="sub">YFU recruitment performance and market context &middot; all figures validated on real data</div>
-<div class="grid">
-<div class="card kpi"><div class="klabel">Final Participants</div><div class="value">773<span class="trend up">▲ +4.2%</span></div><div class="note">2026/27 season vs. 2025/26 (742) &middot; target 800</div>
-<div class="target-line"><div class="bar" style="width:96.6%;background:var(--purple)"></div><div class="mark" style="left:100%"></div></div>
-<div class="note" style="margin-top:4px">96.6% of season target (800)</div></div>
-<div class="card kpi"><div class="klabel">Overall Funnel Conversion</div><div class="value">13.02%</div><div class="note">Final Participants ÷ Registrations (31,423)</div></div>
-<div class="card kpi"><div class="klabel">Recruitment Success Rate</div><div class="value">26.20%</div><div class="note">Contracts Signed ÷ Applications Submitted</div></div>
-<div class="card kpi orange"><div class="klabel">Withdrawal Rate</div><div class="value">9.53%</div><div class="note">431 of 4,522 signed contracts</div></div>
-<div class="card kpi darkblue"><div class="klabel">Market Size (Gesamtmarkt)</div><div class="value">9,287</div><div class="note">2024/25 &middot; all organisations, corrected figure</div></div>
-<div class="card kpi darkblue"><div class="klabel">YFU Market Share</div><div class="value">8.67%<span class="trend up">▲ +1.2pt</span></div><div class="note">vs 7.44% in 2022/23</div></div>
-<div class="card kpi darkblue"><div class="klabel">Market Change</div><div class="value">−9.89%<span class="trend down">▼</span></div><div class="note">Overall market, 2022/23 → 2024/25</div></div>
-<div class="card kpi darkblue"><div class="klabel">YFU Change</div><div class="value">+4.95%<span class="trend up">▲</span></div><div class="note">YFU growing while the market shrinks</div></div>
-
-<div class="card wide"><div class="title">Final Participants by season vs. target</div><div class="muted">EXE-001 &middot; target 800/season (CTR-005) &middot; 2027/28 excluded (season in progress)</div><canvas id="eg"></canvas></div>
-<div class="card wide"><div class="title">YFU vs. Overall Market Change</div><div class="muted">2022/23 → 2024/25 &middot; Gesamtmarktdaten</div><canvas id="es"></canvas></div>
+<!-- EXECUTIVE -->
+<section id="exe" class="page on"><h1>Executive overview</h1>
+<div class="sub">Every metric shows the season it refers to, the previous season's value and the trend.</div>
+<div class="filters"><label>Season<select id="exeSeason" onchange="renderExec()"></select></label><span class="note" id="exeNote" style="margin:0"></span></div>
+<div class="grid" id="exeCards"></div>
+<div class="grid" style="margin-top:16px">
+<div class="card wide"><div class="title">Final Participants &mdash; selected season vs. previous seasons</div><div class="muted">CTR-005 &middot; up to 3 previous seasons &middot; targets: 750 (2026/27), 800 (2027/28), none before</div><div class="chartbox"><canvas id="exeFinal"></canvas></div></div>
+<div class="card wide"><div class="title">Funnel rates by season</div><div class="muted">EXE-002, EXE-003, CTR-006 &middot; completed seasons only</div><div class="chartbox"><canvas id="exeRates"></canvas></div></div>
+<div class="sectionhead">Market context</div>
+<div id="exeMarket" style="display:contents"></div>
+<div class="card full"><div class="title">YFU vs. overall market &mdash; change between available seasons</div><div class="muted">MKT-002 vs. MKT-004 &middot; Gesamtmarktdaten (seasons with data: 2017/18, 2018/19, 2022/23, 2024/25)</div><div class="chartbox"><canvas id="exeMkt"></canvas></div></div>
 </div></section>
 
-<section id="mkt" class="page"><h1>Marketing</h1><div class="sub">Awareness, Interest, Consideration &amp; the handover into Registration</div>
+<!-- MARKETING -->
+<section id="mkt" class="page"><h1>Marketing</h1>
+<div class="sub">Awareness, Interest, Consideration and Registration &middot; current recruitment season 2027/28 (1 Apr 2026 &ndash; 31 Mar 2027)</div>
 <div class="grid">
 <div class="sectionhead">Awareness</div>
-<div class="card kpi teal"><div class="klabel">Social Reach</div><div class="value">140K<span class="badge b-teal">target</span></div><div class="note">Q3 target &middot; Instagram/Facebook/TikTok</div></div>
-<div class="card kpi teal"><div class="klabel">Social Impressions</div><div class="value">210K<span class="badge b-teal">target</span></div><div class="note">Q3 target</div></div>
-<div class="card kpi teal"><div class="klabel">Email Deliveries</div><div class="value">12,560</div><div class="note">Spring + autumn campaigns (CleverReach)</div></div>
-<div class="card kpi teal"><div class="klabel">Letters Sent</div><div class="value">6,099</div><div class="note">Spring + autumn campaigns</div></div>
-<div class="card kpi teal"><div class="klabel">Schulausschreibung Volume</div><div class="value">18,659</div><div class="note">Emails + letters combined (AWR-007)</div></div>
-<div class="card kpi teal"><div class="klabel">School Event Count</div><div class="value">41</div><div class="note">Season 2027/28, entered manually</div></div>
+<div class="card kpi t"><div class="klabel">Social Reach<span class="id">AWR-001</span></div><div class="value">140K<span class="badge b-t">Q3 target</span></div><div class="note">Instagram / Facebook / TikTok &middot; values illustrative until API connection</div></div>
+<div class="card kpi t"><div class="klabel">Social Impressions<span class="id">AWR-002</span></div><div class="value">210K<span class="badge b-t">Q3 target</span></div><div class="note">Values illustrative until API connection</div></div>
+<div class="card kpi t"><div class="klabel">Search Impressions<span class="id">AWR-003</span></div><div class="value">31.4K<span class="badge b-g">illustrative</span></div><div class="note">Google Search Console &middot; example monthly value</div></div>
+<div class="card kpi t"><div class="klabel">School Events<span class="id">AWR-006</span></div><div class="value" id="awr006v">41</div><span class="season">Season 2027/28</span><div class="note">Entered manually &middot; no earlier seasons recorded yet</div></div>
+<div class="card wide"><div class="title">Social Reach by platform over time</div><div><span class="badge b-g">illustrative</span></div><div class="muted">Monthly trend example, Apr&ndash;Sep 2026 &middot; real values once the API is connected</div><div class="chartbox"><canvas id="socReach"></canvas></div></div>
+<div class="card wide"><div class="title">Social Impressions &amp; Search Impressions over time</div><div><span class="badge b-g">illustrative</span></div><div class="muted">AWR-002 / AWR-003 &middot; monthly trend example</div><div class="chartbox"><canvas id="impr"></canvas></div></div>
 
-<div class="card wide"><div class="title">Social Reach by Platform — example split</div><div class="muted badge b-teal" style="display:inline-block">illustrative</div><div class="muted">Breakdown of the 140K Q3 target &middot; real per-platform data pending API connection</div><canvas id="soc"></canvas></div>
-<div class="card wide"><div class="title">Outreach Volume — Email vs. Letter</div><div class="muted">AWR-004 / AWR-005, spring + autumn campaigns &middot; real figures</div><canvas id="sm"></canvas></div>
+<div class="sectionhead">Schulausschreibung &mdash; emails and letters (AWR-004, AWR-005, AWR-007)</div>
+<div class="full" style="grid-column:1/-1"><div class="filters" style="margin:0"><label>Type<select id="awType" onchange="renderAwr()"></select></label><label>Bundesland<select id="awBl" onchange="renderAwr()"></select></label><span class="note" style="margin:0">Real figures, season 2027/28 &middot; split by campaign (spring / autumn)</span></div></div>
+<div id="awrCards" style="display:contents"></div>
+<div class="card wide"><div class="title">Emails delivered and letters sent by campaign</div><div class="muted">Spring = May&ndash;Jun, Autumn = Aug&ndash;Oct &middot; follows the filters above</div><div class="chartbox"><canvas id="awrChart"></canvas></div></div>
+<div class="card wide"><div class="title">School events by month and type</div><div class="muted">AWR-006 &middot; season 2027/28 &middot; real figures</div><div class="chartbox"><canvas id="awr006"></canvas></div></div>
 
-<div class="sectionhead">Interest &amp; Consideration</div>
-<div class="card kpi teal"><div class="klabel">Instagram Engagement Rate</div><div class="value">12.5%<span class="badge b-teal">target</span></div><div class="note">Q3 target</div></div>
-<div class="card kpi teal"><div class="klabel">Website Users</div><div class="value">8,400<span class="badge b-teal">illustrative</span></div><div class="note">Example monthly value — GA4 connection pending</div></div>
-<div class="card kpi teal"><div class="klabel">Website Sessions</div><div class="value">11,200<span class="badge b-teal">illustrative</span></div><div class="note">Example monthly value — GA4 connection pending</div></div>
-<div class="card kpi teal"><div class="klabel">Webinar Participants</div><div class="value">514</div><div class="note">28 Jul – 15 Sept 2026 &middot; real figure</div></div>
-<div class="card kpi teal"><div class="klabel">Brochure Orders</div><div class="value">12,207</div><div class="note">Jan 2022 – Sep 2026, real figure &middot; homepage orders only</div></div>
+<div class="sectionhead">Interest</div>
+<div class="card kpi t"><div class="klabel">Website Users<span class="id">INT-001</span></div><div class="value">8,400<span class="badge b-g">illustrative</span></div><div class="note">Example monthly value &middot; GA4 pending</div></div>
+<div class="card kpi t"><div class="klabel">Website Sessions<span class="id">INT-002</span></div><div class="value">11,200<span class="badge b-g">illustrative</span></div><div class="note">Example monthly value &middot; GA4 pending</div></div>
+<div class="card kpi t"><div class="klabel">Instagram Engagement Rate<span class="id">INT-004</span></div><div class="value">11.8%<span class="badge b-g">illustrative</span></div><div class="note">Q3 target 12.5%</div></div>
+<div class="card kpi t"><div class="klabel">Top traffic source<span class="id">INT-003</span></div><div class="value">Organic<span class="badge b-g">illustrative</span></div><div class="note">Share of sessions, example</div></div>
+<div class="card wide"><div class="title">Website Users &amp; Sessions over time</div><div><span class="badge b-g">illustrative</span></div><div class="muted">INT-001 / INT-002 &middot; monthly trend example</div><div class="chartbox"><canvas id="web"></canvas></div></div>
+<div class="card wide"><div class="title">Website Traffic by Source over time</div><div><span class="badge b-g">illustrative</span></div><div class="muted">INT-003 &middot; sessions per acquisition source</div><div class="chartbox"><canvas id="traffic"></canvas></div></div>
+<div class="card full"><div class="title">Instagram Engagement Rate over time</div><div><span class="badge b-g">illustrative</span></div><div class="muted">INT-004 &middot; target 12.5%</div><div class="chartbox" style="height:220px"><canvas id="igEng"></canvas></div></div>
 
-<div class="card wide"><div class="title">Website Users &amp; Sessions — example trend</div><div class="muted badge b-teal" style="display:inline-block">illustrative</div><div class="muted">Monthly shape example &middot; real GA4 values to be connected</div><canvas id="web"></canvas></div>
-<div class="card wide"><div class="title">Registrations by Channel</div><div class="muted">REG-002 &middot; self-reported "wie hast du von YFU erfahren", all seasons &middot; real figures</div><canvas id="ch"></canvas></div>
+<div class="sectionhead">Consideration</div>
+<div class="card kpi t"><div class="klabel">Webinar Participants<span class="id">CON-001</span></div><div class="value">783</div><span class="season">Season 2027/28</span><div class="bar"><i style="width:58%;background:var(--t2)"></i></div><div class="note">8 Apr &ndash; 15 Sep 2026 &middot; 58% of the 1,350 season target &middot; real figure</div></div>
+<div class="card kpi t"><div class="klabel">Brochure Orders<span class="id">CON-003</span></div><div class="value" id="con003v"></div><div class="note">Jan 2022 &ndash; Sep 2026 &middot; homepage orders only &middot; real figure</div></div>
+<div class="card kpi t"><div class="klabel">Brochure Downloads<span class="id">CON-004</span></div><div class="value">640<span class="badge b-g">illustrative</span></div><div class="note">Example monthly value &middot; GA4 pending</div></div>
+<div class="card kpi t"><div class="klabel">Webinar target progress<span class="id">CON-001</span></div><div class="value">783 / 1,350</div><div class="note">Season 2027/28</div></div>
+<div class="card wide"><div class="title">Webinar Participants by month &mdash; cumulative vs. target</div><div class="muted">CON-001 &middot; season 2027/28 &middot; target 1,350 &middot; real figures</div><div class="chartbox"><canvas id="webinar"></canvas></div></div>
+<div class="card wide"><div class="title">Brochure Orders over time</div><div class="muted">CON-003 &middot; monthly, Jan 2022 &ndash; Sep 2026 &middot; real figures</div><div class="chartbox"><canvas id="brochure"></canvas></div></div>
+
+<div class="sectionhead">Registration &amp; Application</div>
+<div class="full" style="grid-column:1/-1"><div class="filters" style="margin:0"><label>Bundesland<select id="regBl" onchange="renderReg()"></select></label><span class="note" style="margin:0" id="regNote"></span></div></div>
+<div id="regCards" style="display:contents"></div>
+<div class="card wide"><div class="title">Registrations &mdash; cumulative over the recruitment season</div><div class="muted">REG-001 &middot; current season vs. target and previous seasons &middot; real figures</div><div class="chartbox" style="height:300px"><canvas id="regCum"></canvas></div></div>
+<div class="card wide"><div class="title">Registrations by Channel &mdash; mix by season</div><div class="muted">REG-002 &middot; self-reported "Wo hast du von YFU erfahren" &middot; labels harmonised, blanks = "No answer"</div><div class="chartbox" style="height:300px"><canvas id="chMix"></canvas></div></div>
+<div class="card full"><div class="title">Registrations by Channel &mdash; all seasons</div><div class="muted">REG-002 &middot; all seasons combined</div><div class="chartbox" style="height:420px"><canvas id="chAll"></canvas></div></div>
 </div></section>
 
-<section id="fun" class="page"><h1>Funnel</h1><div class="sub">Registration → Application → Contract → Final Participant, all seasons combined (2022/23–2027/28) &middot; real figures throughout</div><div class="filters"><select><option>Destination: All</option></select><select><option>Programme: All</option></select><select><option>Bundesland: All</option></select><select><option>Channel: All</option></select></div>
-<div class="grid"><div class="card wide"><div class="title">Funnel Overview</div><div class="muted">Real figures &middot; YFU Intranet export, person-level</div><div class="funnel">
-<div class="step s1"><span>Registrations<small>REG-001</small></span><span>31,423 <span class="arrow">100%</span></span></div>
-<div class="step s2"><span>Applications<small>APP-001</small></span><span>17,261 <span class="arrow">54.9%</span></span></div>
-<div class="step s3"><span>Contracts Sent<small>CTR-001</small></span><span>6,116 <span class="arrow">19.5%</span></span></div>
-<div class="step s4"><span>Contracts Signed<small>CTR-002</small></span><span>4,522 <span class="arrow">73.9% of sent</span></span></div>
-<div class="step s5"><span>Withdrawals (post-signature)<small>CTR-004</small></span><span>431 <span class="arrow">9.5% of signed</span></span></div>
-<div class="step s6"><span>Final Participants<small>CTR-005</small></span><span>4,091 <span class="arrow">13.0% of Registrations</span></span></div>
-</div></div>
-<div class="card wide"><div class="title">Conversion &amp; Completion — all Ready</div><table><tr><th>KPI</th><th>Value</th><th>Status</th></tr>
-<tr><td>Registration-to-Application Conversion Rate (APP-006)</td><td>54.9%</td><td><span class="status ok">READY</span></td></tr>
-<tr><td>Application Completion Rate (APP-003)</td><td>72.24%</td><td><span class="status ok">READY</span></td></tr>
-<tr><td>Introduction Meeting Attendance Rate (APP-005)</td><td>rate KPI</td><td><span class="status ok">READY</span></td></tr>
-<tr><td>Contract Acceptance Rate (CTR-003)</td><td>73.94%</td><td><span class="status ok">READY</span></td></tr>
-<tr><td>Withdrawal Rate (CTR-006)</td><td>9.53%</td><td><span class="status ok">READY</span></td></tr>
-<tr><td>Overall Funnel Conversion Rate (EXE-002)</td><td>13.02%</td><td><span class="status ok">READY</span></td></tr>
-<tr><td>Recruitment Success Rate (EXE-003)</td><td>26.20%</td><td><span class="status ok">READY</span></td></tr>
-</table></div></div></section>
+<!-- FUNNEL -->
+<section id="fun" class="page"><h1>Funnel</h1>
+<div class="sub">Registration &rarr; Application &rarr; Contract &rarr; Final Participant &middot; real figures</div>
+<div class="filters"><label>Season<select id="funSeason" onchange="renderFun()"></select></label><span class="note" style="margin:0">Programme, destination, Bundesland and channel filters will be added in Power BI.</span></div>
+<div class="grid"><div class="card wide"><div class="title">Funnel overview</div><div class="muted" id="funMuted"></div><div class="funnel" id="funnel"></div></div>
+<div class="card wide"><div class="title">Funnel KPIs &mdash; selected season vs. previous season</div><div class="muted">All Ready</div><div class="scroll"><table id="funTable"></table></div></div>
+</div></section>
 
-<section id="cou" class="page"><h1>Countries</h1><div class="sub">Demand by destination &middot; Gesamtmarktdaten, two reliable comparison seasons &middot; real figures</div><div class="filters"><select><option>Compare: 2022/23 vs 2024/25</option></select></div>
+<!-- COUNTRIES -->
+<section id="cou" class="page"><h1>Countries</h1>
+<div class="sub">All destination countries &middot; compare interest with previous seasons to see where it gets stronger or weaker</div>
 <div class="grid">
-<div class="card full"><div class="title">Destination Map — example layout</div><div class="muted badge b-teal" style="display:inline-block">illustrative layout</div><div class="muted">Bubble size = 2024/25 volume (MKT-005, real figures) &middot; positions approximate, for format review only — a production version would use a proper geo-map visual in Power BI</div>
+<div class="card full"><div class="title">Destination map &mdash; example layout</div><div class="muted"><span class="badge b-g">illustrative layout</span> Bubble size = 2024/25 market volume (MKT-005) &middot; positions approximate &middot; a production version would use a geo-map visual in Power BI</div>
 <div class="mapwrap">
-<div class="blob" style="left:8%;top:14%;width:34%;height:46%"></div>
-<div class="blob" style="left:44%;top:16%;width:14%;height:22%"></div>
-<div class="blob" style="left:40%;top:40%;width:16%;height:34%"></div>
-<div class="blob" style="left:58%;top:20%;width:26%;height:42%"></div>
-<div class="blob" style="left:76%;top:58%;width:16%;height:24%"></div>
-<div class="marker" style="left:20%;top:36%;width:54px;height:54px;background:#642869" title="USA 3,440">USA</div>
-<div class="maplabel" style="left:20%;top:36%">3,440</div>
-<div class="marker" style="left:21%;top:22%;width:44px;height:44px;background:#00B4B9" title="Canada 2,105">CAN</div>
-<div class="maplabel" style="left:21%;top:22%;margin-top:14px">2,105</div>
-<div class="marker" style="left:47%;top:26%;width:26px;height:26px;background:#0AAFE6" title="Ireland 425">IRL</div>
-<div class="maplabel" style="left:47%;top:26%;margin-top:2px">425</div>
-<div class="marker" style="left:84%;top:70%;width:30px;height:30px;background:#F59100" title="Australia 410">AUS</div>
-<div class="maplabel" style="left:84%;top:70%;margin-top:4px">410</div>
-<div class="marker" style="left:90%;top:82%;width:28px;height:28px;background:#C3D74B;color:#5b6a1a" title="New Zealand 942">NZ</div>
-<div class="maplabel" style="left:90%;top:82%;margin-top:2px">942</div>
+<div class="blob" style="left:8%;top:14%;width:34%;height:46%"></div><div class="blob" style="left:44%;top:16%;width:14%;height:22%"></div><div class="blob" style="left:40%;top:40%;width:16%;height:34%"></div><div class="blob" style="left:58%;top:20%;width:26%;height:42%"></div><div class="blob" style="left:76%;top:58%;width:16%;height:24%"></div>
+<div class="marker" style="left:20%;top:36%;width:56px;height:56px;background:#642869">USA</div><div class="maplabel" style="left:20%;top:36%;margin-top:16px">3,494</div>
+<div class="marker" style="left:21%;top:20%;width:44px;height:44px;background:#00B4B9">CAN</div><div class="maplabel" style="left:21%;top:20%;margin-top:14px">2,105</div>
+<div class="marker" style="left:47%;top:26%;width:26px;height:26px;background:#8e5a93">IRL</div><div class="maplabel" style="left:47%;top:26%;margin-top:2px">425</div>
+<div class="marker" style="left:84%;top:68%;width:30px;height:30px;background:#008a8f">AUS</div><div class="maplabel" style="left:84%;top:68%;margin-top:4px">410</div>
+<div class="marker" style="left:90%;top:82%;width:30px;height:30px;background:#7fd8db;color:#00494c">NZ</div><div class="maplabel" style="left:90%;top:82%;margin-top:2px">942</div>
 </div></div>
-<div class="card wide"><div class="title">Top 5 Destinations — ranked, 2024/25</div><div class="muted">MKT-005 &middot; all organisations</div><canvas id="ct"></canvas></div>
-<div class="card wide"><div class="title">Destination Share — 2024/25</div><div class="muted">Volume, all organisations</div><canvas id="cb"></canvas></div>
-<div class="card full"><div class="note"><b>Note:</b> New Zealand is the only major destination that grew between 2022/23 and 2024/25 (676 → 942). USA and Canada remain the largest destinations but both declined over the same period. Application- and Participant-level destination breakdowns (APP-001, CTR-005 — YFU-specific, not market-wide) will populate here once per-country figures are extracted from the Intranet export.</div></div>
+
+<div class="sectionhead">YFU demand by country (Intranet)</div>
+<div class="full" style="grid-column:1/-1"><div class="filters" style="margin:0"><label>Metric<select id="couMetric" onchange="renderCou()"><option value="app">Applications &middot; APP-001 (first-choice country)</option><option value="fin">Final Participants &middot; CTR-005</option></select></label><label>Season<select id="couSeason" onchange="renderCou()"></select></label><span class="note" style="margin:0" id="couNote"></span></div></div>
+<div class="card span8"><div class="title" id="couTitle"></div><div class="muted">Selected season vs. previous season &middot; all countries, sorted by selected season</div><div class="chartbox" id="couBox"><canvas id="couChart"></canvas></div></div>
+<div class="card span4"><div class="title">Change by country</div><div class="muted">&#9650; interest stronger &middot; &#9660; weaker &middot; country/region targets can be added as a column once YFU provides them</div><div class="scroll" style="max-height:640px"><table id="couTable"></table></div></div>
+
+<div class="sectionhead">Market demand by destination country (Gesamtmarkt)</div>
+<div class="card span8"><div class="title">Market demand by country across seasons</div><div class="muted">MKT-005 &middot; top 8 countries &middot; all organisations &middot; seasons with data</div><div class="chartbox" style="height:320px"><canvas id="couMkt"></canvas></div></div>
+<div class="card span4"><div class="title">All 20 countries</div><div class="muted">2022/23 &rarr; 2024/25</div><div class="scroll" style="max-height:340px"><table id="couMktTable"></table></div></div>
+
+<div class="sectionhead">AJA market by destination country</div>
+<div class="card full"><div class="title">Total Market Size (AJA) &mdash; distribution by destination country</div><div class="muted">MKT-008 &middot; sending, excl. aubiko / Volunta &middot; top 8 countries + others, 9 seasons &middot; note: Belgium jumps to 495 in 2025/26 (YFU 334, AFS 156) &mdash; looks like a source anomaly, to be verified</div><div class="chartbox" style="height:320px"><canvas id="couAja"></canvas></div></div>
 </div></section>
 
-<section id="mar" class="page"><h1>Market</h1><div class="sub">SQ2 &middot; Overall market development and YFU's position — Gesamtmarkt and AJA (nonprofit) views side by side &middot; real figures throughout</div>
+<!-- MARKET -->
+<section id="mar" class="page"><h1>Market</h1>
+<div class="sub">SQ2 &middot; Gesamtmarkt (all organisations) and AJA (nonprofit) &middot; all seasons with available data</div>
 <div class="grid">
-<div class="sectionhead">Gesamtmarkt — the whole German exchange market</div>
-<div class="card kpi darkblue"><div class="klabel">Market Size</div><div class="value">9,287</div><div class="note">2024/25 &middot; corrected (YFU incl. PPP programmes)</div></div>
-<div class="card kpi darkblue"><div class="klabel">Market Change</div><div class="value">−9.89%</div><div class="note">2022/23 → 2024/25</div></div>
-<div class="card kpi darkblue"><div class="klabel">YFU Market Share</div><div class="value">8.67%</div><div class="note">2024/25</div></div>
-<div class="card kpi darkblue"><div class="klabel">YFU Change</div><div class="value">+4.95%</div><div class="note">YFU growing while the market shrinks</div></div>
-<div class="card wide"><div class="title">Market Size vs. YFU Volume</div><div class="muted">Gesamtmarktdaten, 2022/23 → 2024/25</div><canvas id="mv"></canvas></div>
-<div class="card wide"><div class="title">YFU Market Share</div><div class="muted">YFU ÷ market total</div><canvas id="ms"></canvas></div>
+<div class="sectionhead">Gesamtmarkt &mdash; the whole German exchange market</div>
+<div id="mktCards" style="display:contents"></div>
+<div class="card wide"><div class="title">Total Market Size vs. YFU Volume</div><div class="muted">MKT-001 &middot; Gesamtmarktdaten &middot; seasons with data</div><div class="chartbox"><canvas id="mv"></canvas></div></div>
+<div class="card wide"><div class="title">YFU Market Share</div><div class="muted">MKT-003 &middot; YFU &divide; market total</div><div class="chartbox"><canvas id="ms"></canvas></div></div>
+<div class="card full"><div class="title">Market growth vs. YFU growth between available seasons</div><div class="muted">MKT-002 / MKT-004 &middot; seasons are not consecutive: 2018/19 &rarr; 2022/23 spans four years</div><div class="chartbox" style="height:240px"><canvas id="mg"></canvas></div></div>
+<div class="card full"><div class="note"><b>Note:</b> The number of reporting organisations differs by season (43, 38, 39 and 36), so earlier seasons are shown for reference. USA 2024/25 is 3,494 in the corrected file (YFU's own USA figure was updated to 213).</div></div>
 
-<div class="sectionhead">AJA — nonprofit/associative exchange organisations only</div>
-<div class="card kpi orange"><div class="klabel">Market Size (AJA)</div><div class="value">3,158</div><div class="note">2025/26 &middot; excl. aubiko, Volunta, Rotary</div></div>
-<div class="card kpi orange"><div class="klabel">Market Change (AJA)</div><div class="value">+10.8%</div><div class="note">2024/25 → 2025/26</div></div>
-<div class="card kpi orange"><div class="klabel">YFU Market Share (AJA)</div><div class="value">33.76%</div><div class="note">2025/26 &middot; up from 30.72% in 2017/18</div></div>
-<div class="card kpi orange"><div class="klabel">YFU Change (AJA)</div><div class="value">+32.4%</div><div class="note">2024/25 → 2025/26, vs +10.8% market</div></div>
-<div class="card wide"><div class="title">Total Market Size — AJA (9-year history)</div><div class="muted">MKT-008 &middot; sending, excl. aubiko/Volunta/Rotary</div><canvas id="aja1"></canvas></div>
-<div class="card wide"><div class="title">YFU Market Share — AJA (9-year history)</div><div class="muted">MKT-010 &middot; consistently 3–4× higher than the Gesamtmarkt share</div><canvas id="aja2"></canvas></div>
-
-<div class="sectionhead">Destination &amp; Programme Mix</div>
-<div class="card full"><div class="title">Demand Trend by Destination Country (Gesamtmarkt)</div><div class="muted">MKT-005</div><canvas id="mc"></canvas></div>
-<div class="card full"><div class="title">Programme Mix — JP / SP / TP (AJA)</div><div class="muted">MKT-006 &middot; all AJA organisations except aubiko, Volunta and Rotary</div><canvas id="pm"></canvas></div>
-<div class="card full"><div class="note"><b>Why two market shares?</b> Gesamtmarktdaten covers every organisation in the German exchange market, so YFU's share there (8.67%) reflects its position across the whole market. The AJA dataset covers only nonprofit/associative organisations — a smaller, more comparable peer group — where YFU's share (33.76%) is much higher. Both are correct; they answer different questions, so they should never be mixed into a single "market share" number. <b>MKT-007</b> (YFU Total Students Sent, historical volume) was rejected by the data owner as duplicating CTR-005/EXE-001 and is kept in the Catalogue for reference only — it does not appear on this dashboard.</div></div>
+<div class="sectionhead">AJA &mdash; nonprofit / associative exchange organisations</div>
+<div id="ajaCards" style="display:contents"></div>
+<div class="card full"><div class="filters" style="margin-bottom:8px"><label>Split by<select id="ajaSplit" onchange="renderAja()"><option value="none">None (total)</option><option value="org">Organisation</option><option value="country">Country</option><option value="bl">Bundesland</option></select></label><span class="note" style="margin:0" id="ajaNote"></span></div><div class="title">Total Market Size (AJA) &mdash; 9 seasons</div><div class="muted">MKT-008 &middot; sending, excl. aubiko / Volunta</div><div class="chartbox" style="height:320px"><canvas id="aja1"></canvas></div></div>
+<div class="card wide"><div class="title">YFU Market Share (AJA)</div><div class="muted">MKT-010</div><div class="chartbox"><canvas id="aja2"></canvas></div></div>
+<div class="card wide"><div class="title">YFU growth vs. AJA market growth</div><div class="muted">MKT-009 / MKT-011 &middot; change vs. previous season, %</div><div class="chartbox"><canvas id="aja3"></canvas></div></div>
+<div class="sectionhead">Programme mix</div>
+<div id="pmCard" style="display:contents"></div>
+<div class="card full"><div class="title">Programme Mix &mdash; JP / SP / TP (AJA)</div><div class="muted">MKT-006 &middot; sending</div><div class="chartbox"><canvas id="pm"></canvas></div></div>
 </div></section>
 
-<section id="dq" class="page"><h1>Data Quality</h1><div class="sub">Source status, ownership and open points &middot; one row per feeding data source</div><div class="card"><table><tr><th>Data Source</th><th>Feeds</th><th>Known Issue</th><th>Owner</th><th>Conclusion</th></tr>
-<tr><td>YFU Intranet</td><td>04_Registration, 05_Application, 06_Contract, 01_Awareness (AWR-006), 03_Consideration (CON-003)</td><td>—</td><td>Veronica</td><td>—</td></tr>
-<tr><td>Google Analytics (GA4)</td><td>02_Interest, 03_Consideration (CON-004)</td><td>—</td><td>Maike</td><td>—</td></tr>
-<tr><td>Google Search Console</td><td>01_Awareness (AWR-003)</td><td>—</td><td>Maike</td><td>—</td></tr>
-<tr><td>Social Media Analytics (Instagram/Facebook/TikTok)</td><td>01_Awareness, 02_Interest (INT-004)</td><td>Currently collected via manual export; API/connector-based collection has been confirmed as feasible, switch planned.</td><td>Miriam</td><td><span class="badge b-teal">Decided — API switch planned</span></td></tr>
-<tr><td>CleverReach</td><td>01_Awareness (AWR-004)</td><td>Bundesland breakdown only available from the next mailing campaign onward — no historical regional data.</td><td>Maike, Adrian</td><td>—</td></tr>
-<tr><td>Mailing file / Steuerdatei (Letters Sent)</td><td>01_Awareness (AWR-005)</td><td>Source name inconsistent across documents ("Mailing Database" here vs. "Steuerdatei" in the tracking sheet) — to confirm which is correct. Bundesland breakdown forward-looking only.</td><td>Maike, Adrian</td><td><span class="badge b-purple">To be confirmed (name check)</span></td></tr>
-<tr><td>Market data — Gesamtmarktdaten</td><td>08_Market (MKT-001 to MKT-007)</td><td>—</td><td>Thomas</td><td>—</td></tr>
-<tr><td>Market data — AJA dataset</td><td>08_Market (MKT-008 to MKT-011)</td><td>—</td><td>Thomas</td><td>—</td></tr>
-<tr><td>Manual tracking sheets (Webinars, School Events, Brochures)</td><td>01_Awareness (AWR-006), 03_Consideration (CON-001, CON-003)</td><td>AWR-006 and CON-001 remain "Partially Available" — limited historical depth (single season / Jul–Sep 2026 only), not a data issue.</td><td>Adrian</td><td>—</td></tr>
-</table></div></section>
+<!-- DATA QUALITY -->
+<section id="dq" class="page"><h1>Data Quality</h1><div class="sub">Source status, ownership and open points &middot; one row per feeding data source</div><div class="card"><table id="dqTable"></table></div></section>
 </div>
 <script>
-function show(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on');b.classList.add('on')}
-const O={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,grid:{color:'#f0ecf1'}},x:{grid:{display:false}}}};
-/* Official YFU secondary palette, in swatch order: Study Abroad, Host a Student, Volunteer, Educators, Alumni, Donors */
-const palette=['#00B4B9','#F59100','#E6004B','#0AAFE6','#C3D74B','#005A82'];
+const D={"seasons":["2022/23","2023/24","2024/25","2025/26","2026/27","2027/28"],"funnel":{"2022/23":{"reg":4667,"app":2842,"cons":2173,"sent":1121,"signed":873,"wd":113,"final":760,"inv":2464,"att":2113},"2023/24":{"reg":4975,"app":2693,"cons":1963,"sent":1011,"signed":770,"wd":88,"final":682,"inv":2352,"att":2018},"2024/25":{"reg":5726,"app":3247,"cons":2434,"sent":1198,"signed":891,"wd":83,"final":808,"inv":2908,"att":2388},"2025/26":{"reg":5722,"app":3136,"cons":2291,"sent":1087,"signed":809,"wd":67,"final":742,"inv":2794,"att":2282},"2026/27":{"reg":6026,"app":3209,"cons":2222,"sent":1167,"signed":851,"wd":79,"final":772,"inv":2817,"att":2278},"2027/28":{"reg":4591,"app":2297,"cons":1537,"sent":580,"signed":356,"wd":4,"final":352,"inv":1750,"att":1481}},"cum":{"ALL":{"2022/23":[411,618,983,1659,2060,2639,3345,3887,4204,4383,4641,4666,4667],"2023/24":[630,891,1532,2055,2463,3035,3625,3995,4395,4571,4808,4971,4975],"2024/25":[529,793,1444,2057,2582,3259,3978,4422,4844,5102,5515,5722,5726],"2025/26":[700,998,1534,2271,2738,3395,4159,4577,4908,5159,5523,5709,5722],"2026/27":[691,907,1632,2179,2744,3406,4213,4642,5122,5387,5684,5891,6026],"2027/28":[770,1055,1623,2289,2843,3580,4591,null,null,null,null,null,null]},"Atatürk Mahallesi/ Cigli/ Izmir":{"2022/23":[0,0,0,0,0,0,0,0,0,0,0,0,0],"2023/24":[0,0,0,0,0,0,0,0,0,0,0,0,0],"2024/25":[0,0,0,0,0,0,0,0,0,0,0,0,0],"2025/26":[0,0,0,0,0,1,1,1,1,1,1,1,1],"2026/27":[0,0,0,0,0,0,0,0,0,0,0,0,0],"2027/28":[0,0,0,0,0,0,0,null,null,null,null,null,null]},"Baden-Württemberg":{"2022/23":[43,62,83,127,171,226,266,308,336,355,376,382,382],"2023/24":[57,77,131,166,197,234,275,302,333,349,382,400,400],"2024/25":[36,55,93,122,164,210,248,281,303,329,375,387,387],"2025/26":[49,65,113,147,169,202,250,287,310,329,353,362,362],"2026/27":[44,58,105,134,177,212,238,263,305,318,341,357,371],"2027/28":[43,66,112,146,172,206,250,null,null,null,null,null,null]},"Bayern":{"2022/23":[44,61,85,161,204,243,283,345,371,383,418,422,423],"2023/24":[120,167,299,405,495,585,685,776,899,938,976,1004,1005],"2024/25":[94,140,256,393,540,665,769,875,957,1004,1075,1117,1117],"2025/26":[98,145,219,362,484,568,678,789,872,947,1049,1094,1095],"2026/27":[141,195,361,459,636,749,875,980,1071,1120,1176,1210,1237],"2027/28":[155,219,311,498,643,753,897,null,null,null,null,null,null]},"Berlin":{"2022/23":[37,53,75,130,148,213,261,319,354,370,388,390,390],"2023/24":[48,67,105,138,166,217,289,326,359,374,390,414,414],"2024/25":[47,67,101,131,157,199,256,299,333,349,391,417,417],"2025/26":[69,96,121,158,183,227,285,324,358,375,414,438,439],"2026/27":[42,67,116,152,192,224,271,307,367,399,420,439,450],"2027/28":[56,82,113,142,169,213,268,null,null,null,null,null,null]},"Brandenburg":{"2022/23":[16,22,34,52,58,82,111,128,140,149,164,164,164],"2023/24":[16,24,51,68,87,120,146,167,181,193,202,211,211],"2024/25":[20,26,59,92,107,129,151,170,185,196,216,221,221],"2025/26":[26,32,54,83,102,122,151,162,172,177,191,195,195],"2026/27":[15,22,39,63,90,110,135,148,171,181,195,207,211],"2027/28":[31,41,60,74,94,119,139,null,null,null,null,null,null]},"Bremen":{"2022/23":[11,11,14,20,21,26,35,44,47,48,50,52,52],"2023/24":[7,12,20,23,32,39,50,55,60,61,61,63,63],"2024/25":[7,11,16,27,35,43,50,53,55,56,59,60,60],"2025/26":[6,8,16,26,33,41,52,56,60,60,61,61,62],"2026/27":[5,9,17,23,25,30,39,42,46,47,49,50,51],"2027/28":[7,12,20,26,34,45,57,null,null,null,null,null,null]},"Hamburg":{"2022/23":[44,71,98,134,151,213,258,298,326,344,372,375,375],"2023/24":[56,77,110,148,175,215,255,280,303,319,347,358,360],"2024/25":[52,76,121,158,195,229,275,302,342,360,391,403,403],"2025/26":[65,95,134,196,219,245,306,332,353,373,411,425,426],"2026/27":[63,79,119,157,183,217,276,326,376,392,416,439,448],"2027/28":[56,80,103,129,161,212,289,null,null,null,null,null,null]},"Hessen":{"2022/23":[19,37,60,107,138,158,199,237,264,280,299,300,300],"2023/24":[41,59,86,122,145,180,226,251,278,285,309,319,319],"2024/25":[24,36,72,101,130,166,199,218,248,268,295,312,314],"2025/26":[48,64,95,129,151,189,229,258,272,292,309,313,314],"2026/27":[39,44,86,111,134,183,256,273,294,309,328,343,351],"2027/28":[49,60,93,120,137,191,247,null,null,null,null,null,null]},"Mecklenburg-Vorpommern":{"2022/23":[8,13,24,32,37,53,67,81,86,87,92,92,92],"2023/24":[12,18,33,43,48,62,73,77,83,85,92,94,94],"2024/25":[13,20,27,33,45,55,71,76,84,90,91,94,94],"2025/26":[7,13,24,37,47,54,73,79,80,82,85,88,88],"2026/27":[11,12,29,38,41,51,67,72,77,81,86,91,94],"2027/28":[14,17,33,44,48,63,81,null,null,null,null,null,null]},"Niedersachsen":{"2022/23":[56,83,141,262,351,431,557,656,710,734,772,772,772],"2023/24":[93,144,254,343,406,495,599,645,692,722,751,770,770],"2024/25":[50,97,185,259,309,393,504,546,599,631,680,701,703],"2025/26":[91,136,207,300,353,480,584,619,650,669,705,723,725],"2026/27":[86,114,213,287,355,468,605,649,696,729,756,777,787],"2027/28":[103,136,221,310,384,506,672,null,null,null,null,null,null]},"Nordrhein-Westfalen":{"2022/23":[59,99,183,314,380,496,643,723,779,807,842,848,848],"2023/24":[71,99,169,234,264,347,400,426,451,464,484,501,501],"2024/25":[90,127,248,370,446,623,791,872,953,986,1054,1089,1089],"2025/26":[116,171,297,447,531,696,862,932,995,1030,1075,1114,1118],"2026/27":[124,158,292,401,486,609,753,824,902,949,1007,1040,1057],"2027/28":[127,176,282,407,545,687,928,null,null,null,null,null,null]},"Rheinland-Pfalz":{"2022/23":[13,18,31,57,81,100,128,148,158,167,177,177,177],"2023/24":[27,34,72,99,124,140,157,172,177,182,188,194,194],"2024/25":[15,20,49,67,88,109,121,131,138,143,152,157,157],"2025/26":[11,21,44,83,103,119,148,154,164,167,172,177,177],"2026/27":[14,20,39,61,76,101,139,150,167,173,180,182,186],"2027/28":[22,30,54,77,92,118,159,null,null,null,null,null,null]},"Saarland":{"2022/23":[1,1,4,9,12,16,48,50,50,52,55,55,55],"2023/24":[5,6,19,28,31,43,45,46,46,46,48,48,48],"2024/25":[3,4,15,27,37,42,48,50,50,51,54,55,55],"2025/26":[6,8,12,17,22,35,41,43,44,45,47,48,48],"2026/27":[3,3,8,11,14,15,24,27,29,33,33,34,34],"2027/28":[3,5,12,20,25,32,46,null,null,null,null,null,null]},"Sachsen":{"2022/23":[12,19,41,78,95,108,133,152,158,165,174,174,174],"2023/24":[19,30,50,67,83,98,125,146,167,172,178,180,180],"2024/25":[17,25,45,61,67,88,122,139,157,171,180,182,182],"2025/26":[30,36,48,71,84,102,126,137,145,155,165,169,170],"2026/27":[34,42,65,84,100,137,164,174,188,200,204,210,216],"2027/28":[33,38,58,84,97,130,158,null,null,null,null,null,null]},"Sachsen-Anhalt":{"2022/23":[9,13,21,36,43,52,64,68,70,71,74,74,74],"2023/24":[12,19,32,39,46,60,72,73,92,97,99,104,104],"2024/25":[10,15,34,48,58,67,73,78,82,85,91,96,96],"2025/26":[11,20,30,36,44,63,72,75,82,88,91,92,93],"2026/27":[10,13,25,31,37,54,65,68,73,80,96,107,115],"2027/28":[13,19,30,53,57,72,89,null,null,null,null,null,null]},"Schleswig-Holstein":{"2022/23":[27,39,66,104,127,174,221,243,255,266,277,278,278],"2023/24":[33,41,78,98,125,152,172,189,202,211,221,227,228],"2024/25":[31,45,84,122,149,175,222,243,260,274,290,303,303],"2025/26":[50,61,91,139,170,197,237,261,276,286,303,310,310],"2026/27":[49,55,92,127,154,179,207,226,239,251,261,267,279],"2027/28":[46,61,95,124,139,176,232,null,null,null,null,null,null]},"Thüringen":{"2022/23":[8,11,16,27,32,34,50,57,65,66,71,71,71],"2023/24":[10,12,17,25,29,35,42,47,50,50,52,54,54],"2024/25":[13,20,26,32,39,47,55,62,67,72,80,82,82],"2025/26":[9,18,20,28,31,39,44,46,47,49,53,57,57],"2026/27":[7,9,17,27,29,46,73,80,86,87,90,90,90],"2027/28":[5,6,15,21,26,32,47,null,null,null,null,null,null]}},"states":["Atatürk Mahallesi/ Cigli/ Izmir","Baden-Württemberg","Bayern","Berlin","Brandenburg","Bremen","Hamburg","Hessen","Mecklenburg-Vorpommern","Niedersachsen","Nordrhein-Westfalen","Rheinland-Pfalz","Saarland","Sachsen","Sachsen-Anhalt","Schleswig-Holstein","Thüringen"],"c_app":{"Argentinien":{"2022/23":13,"2023/24":28,"2024/25":22,"2025/26":15,"2026/27":30,"2027/28":19},"Australien":{"2022/23":89,"2023/24":96,"2024/25":82,"2025/26":74,"2026/27":96,"2027/28":56},"Belgien":{"2022/23":7,"2023/24":4,"2024/25":8,"2025/26":11,"2026/27":7,"2027/28":4},"Brasilien":{"2022/23":8,"2023/24":23,"2024/25":23,"2025/26":33,"2026/27":44,"2027/28":19},"Bulgarien":{"2022/23":1,"2023/24":3,"2024/25":4,"2025/26":3,"2026/27":0,"2027/28":0},"Chile":{"2022/23":14,"2023/24":19,"2024/25":21,"2025/26":18,"2026/27":29,"2027/28":22},"China":{"2022/23":36,"2023/24":15,"2024/25":46,"2025/26":40,"2026/27":53,"2027/28":41},"Costa Rica":{"2022/23":47,"2023/24":48,"2024/25":68,"2025/26":71,"2026/27":72,"2027/28":32},"Dänemark":{"2022/23":24,"2023/24":20,"2024/25":27,"2025/26":11,"2026/27":25,"2027/28":11},"Ecuador":{"2022/23":10,"2023/24":4,"2024/25":5,"2025/26":6,"2026/27":6,"2027/28":2},"Estland":{"2022/23":19,"2023/24":22,"2024/25":22,"2025/26":14,"2026/27":16,"2027/28":10},"Finnland":{"2022/23":41,"2023/24":42,"2024/25":37,"2025/26":27,"2026/27":43,"2027/28":20},"Frankreich":{"2022/23":0,"2023/24":0,"2024/25":103,"2025/26":86,"2026/27":86,"2027/28":57},"Großbritannien":{"2022/23":85,"2023/24":85,"2024/25":125,"2025/26":97,"2026/27":145,"2027/28":61},"Indien":{"2022/23":2,"2023/24":4,"2024/25":12,"2025/26":8,"2026/27":10,"2027/28":4},"Irland":{"2022/23":165,"2023/24":145,"2024/25":147,"2025/26":94,"2026/27":122,"2027/28":60},"Italien":{"2022/23":0,"2023/24":0,"2024/25":0,"2025/26":0,"2026/27":50,"2027/28":21},"Japan":{"2022/23":100,"2023/24":93,"2024/25":84,"2025/26":86,"2026/27":132,"2027/28":124},"Kanada":{"2022/23":401,"2023/24":327,"2024/25":327,"2025/26":300,"2026/27":418,"2027/28":219},"Lettland":{"2022/23":2,"2023/24":4,"2024/25":3,"2025/26":2,"2026/27":3,"2027/28":3},"Litauen":{"2022/23":3,"2023/24":0,"2024/25":0,"2025/26":0,"2026/27":0,"2027/28":0},"Mexiko":{"2022/23":0,"2023/24":0,"2024/25":0,"2025/26":6,"2026/27":15,"2027/28":11},"Moldawien":{"2022/23":0,"2023/24":1,"2024/25":0,"2025/26":0,"2026/27":0,"2027/28":0},"Niederlande":{"2022/23":16,"2023/24":18,"2024/25":12,"2025/26":11,"2026/27":0,"2027/28":0},"Norwegen":{"2022/23":35,"2023/24":48,"2024/25":63,"2025/26":57,"2026/27":58,"2027/28":26},"Paraguay":{"2022/23":5,"2023/24":4,"2024/25":3,"2025/26":7,"2026/27":10,"2027/28":6},"Polen":{"2022/23":4,"2023/24":5,"2024/25":11,"2025/26":13,"2026/27":9,"2027/28":8},"Rumänien":{"2022/23":2,"2023/24":0,"2024/25":2,"2025/26":6,"2026/27":4,"2027/28":1},"Schweden":{"2022/23":36,"2023/24":0,"2024/25":0,"2025/26":0,"2026/27":0,"2027/28":0},"Schweiz":{"2022/23":6,"2023/24":6,"2024/25":6,"2025/26":9,"2026/27":5,"2027/28":2},"Spanien":{"2022/23":49,"2023/24":48,"2024/25":84,"2025/26":80,"2026/27":64,"2027/28":31},"Südafrika":{"2022/23":19,"2023/24":38,"2024/25":21,"2025/26":26,"2026/27":27,"2027/28":12},"Thailand":{"2022/23":13,"2023/24":18,"2024/25":36,"2025/26":30,"2026/27":46,"2027/28":36},"Tschechien":{"2022/23":2,"2023/24":6,"2024/25":5,"2025/26":5,"2026/27":9,"2027/28":6},"Türkei":{"2022/23":5,"2023/24":5,"2024/25":6,"2025/26":7,"2026/27":6,"2027/28":4},"USA":{"2022/23":770,"2023/24":704,"2024/25":960,"2025/26":933,"2026/27":731,"2027/28":585},"Ungarn":{"2022/23":6,"2023/24":2,"2024/25":8,"2025/26":6,"2026/27":11,"2027/28":10},"Uruguay":{"2022/23":17,"2023/24":11,"2024/25":11,"2025/26":18,"2026/27":28,"2027/28":10},"Österreich":{"2022/23":0,"2023/24":0,"2024/25":0,"2025/26":0,"2026/27":0,"2027/28":3}},"c_fin":{"Argentinien":{"2022/23":19,"2023/24":24,"2024/25":26,"2025/26":20,"2026/27":28,"2027/28":11},"Australien":{"2022/23":19,"2023/24":27,"2024/25":19,"2025/26":15,"2026/27":18,"2027/28":11},"Belgien":{"2022/23":8,"2023/24":5,"2024/25":10,"2025/26":9,"2026/27":6,"2027/28":2},"Brasilien":{"2022/23":5,"2023/24":10,"2024/25":19,"2025/26":18,"2026/27":18,"2027/28":10},"Bulgarien":{"2022/23":1,"2023/24":4,"2024/25":1,"2025/26":0,"2026/27":0,"2027/28":0},"Chile":{"2022/23":21,"2023/24":14,"2024/25":29,"2025/26":18,"2026/27":28,"2027/28":13},"China":{"2022/23":0,"2023/24":0,"2024/25":10,"2025/26":12,"2026/27":20,"2027/28":8},"Costa Rica":{"2022/23":20,"2023/24":20,"2024/25":20,"2025/26":21,"2026/27":22,"2027/28":11},"Dänemark":{"2022/23":8,"2023/24":5,"2024/25":5,"2025/26":6,"2026/27":6,"2027/28":4},"Ecuador":{"2022/23":15,"2023/24":9,"2024/25":9,"2025/26":6,"2026/27":11,"2027/28":3},"Estland":{"2022/23":23,"2023/24":26,"2024/25":22,"2025/26":19,"2026/27":22,"2027/28":7},"Finnland":{"2022/23":25,"2023/24":21,"2024/25":19,"2025/26":16,"2026/27":10,"2027/28":6},"Frankreich":{"2022/23":37,"2023/24":26,"2024/25":32,"2025/26":29,"2026/27":40,"2027/28":19},"Großbritannien":{"2022/23":12,"2023/24":5,"2024/25":16,"2025/26":13,"2026/27":18,"2027/28":5},"Indien":{"2022/23":0,"2023/24":1,"2024/25":5,"2025/26":3,"2026/27":4,"2027/28":4},"Irland":{"2022/23":61,"2023/24":38,"2024/25":46,"2025/26":50,"2026/27":53,"2027/28":14},"Italien":{"2022/23":12,"2023/24":2,"2024/25":3,"2025/26":0,"2026/27":8,"2027/28":2},"Japan":{"2022/23":22,"2023/24":23,"2024/25":22,"2025/26":22,"2026/27":20,"2027/28":12},"Kanada":{"2022/23":168,"2023/24":147,"2024/25":191,"2025/26":179,"2026/27":185,"2027/28":71},"Lettland":{"2022/23":0,"2023/24":0,"2024/25":0,"2025/26":2,"2026/27":2,"2027/28":3},"Mexiko":{"2022/23":0,"2023/24":0,"2024/25":0,"2025/26":3,"2026/27":11,"2027/28":7},"Niederlande":{"2022/23":8,"2023/24":7,"2024/25":4,"2025/26":0,"2026/27":0,"2027/28":0},"Norwegen":{"2022/23":7,"2023/24":7,"2024/25":6,"2025/26":5,"2026/27":2,"2027/28":4},"Paraguay":{"2022/23":18,"2023/24":11,"2024/25":15,"2025/26":17,"2026/27":19,"2027/28":5},"Polen":{"2022/23":2,"2023/24":2,"2024/25":3,"2025/26":4,"2026/27":3,"2027/28":0},"Schweiz":{"2022/23":3,"2023/24":3,"2024/25":2,"2025/26":1,"2026/27":4,"2027/28":0},"Spanien":{"2022/23":10,"2023/24":11,"2024/25":11,"2025/26":9,"2026/27":6,"2027/28":6},"Südafrika":{"2022/23":12,"2023/24":11,"2024/25":6,"2025/26":6,"2026/27":5,"2027/28":1},"Thailand":{"2022/23":8,"2023/24":11,"2024/25":12,"2025/26":11,"2026/27":15,"2027/28":8},"Tschechien":{"2022/23":2,"2023/24":3,"2024/25":5,"2025/26":5,"2026/27":4,"2027/28":4},"Türkei":{"2022/23":0,"2023/24":2,"2024/25":4,"2025/26":1,"2026/27":3,"2027/28":3},"USA":{"2022/23":196,"2023/24":191,"2024/25":212,"2025/26":191,"2026/27":154,"2027/28":85},"Ungarn":{"2022/23":4,"2023/24":2,"2024/25":6,"2025/26":9,"2026/27":6,"2027/28":5},"Uruguay":{"2022/23":14,"2023/24":14,"2024/25":18,"2025/26":22,"2026/27":21,"2027/28":8}},"c_app_none":{"2022/23":790,"2023/24":797,"2024/25":853,"2025/26":926,"2026/27":799,"2027/28":761},"c_fin_none":{"2022/23":0,"2023/24":0,"2024/25":0,"2025/26":0,"2026/27":0,"2027/28":0},"channels":{"No answer":{"2022/23":1455,"2023/24":1428,"2024/25":1605,"2025/26":1712,"2026/27":1755,"2027/28":1585,"tot":9540},"Internet / online search":{"2022/23":1119,"2023/24":1302,"2024/25":1526,"2025/26":1429,"2026/27":1755,"2027/28":1086,"tot":8217},"Friends, acquaintances, relatives":{"2022/23":729,"2023/24":744,"2024/25":831,"2025/26":772,"2026/27":768,"2027/28":607,"tot":4451},"Teachers":{"2022/23":458,"2023/24":465,"2024/25":515,"2025/26":520,"2026/27":530,"2027/28":326,"tot":2814},"Former participants":{"2022/23":383,"2023/24":403,"2024/25":490,"2025/26":446,"2026/27":388,"2027/28":280,"tot":2390},"School info event":{"2022/23":257,"2023/24":331,"2024/25":390,"2025/26":436,"2026/27":412,"2027/28":261,"tot":2087},"TikTok":{"2022/23":0,"2023/24":0,"2024/25":86,"2025/26":119,"2026/27":153,"2027/28":218,"tot":576},"Flyer / poster":{"2022/23":59,"2023/24":76,"2024/25":76,"2025/26":74,"2026/27":72,"2027/28":48,"tot":405},"Fair (Messe)":{"2022/23":55,"2023/24":82,"2024/25":75,"2025/26":69,"2026/27":62,"2027/28":56,"tot":399},"We were a host family":{"2022/23":49,"2023/24":46,"2024/25":53,"2025/26":48,"2026/27":48,"2027/28":25,"tot":269},"Instagram":{"2022/23":28,"2023/24":30,"2024/25":22,"2025/26":22,"2026/27":25,"2027/28":28,"tot":155},"YFU info event":{"2022/23":16,"2023/24":24,"2024/25":23,"2025/26":35,"2026/27":29,"2027/28":27,"tot":154},"YouTube":{"2022/23":43,"2023/24":31,"2024/25":10,"2025/26":15,"2026/27":11,"2027/28":17,"tot":127},"Newspaper / magazine":{"2022/23":10,"2023/24":8,"2024/25":18,"2025/26":21,"2026/27":14,"2027/28":8,"tot":79},"Facebook":{"2022/23":4,"2023/24":2,"2024/25":2,"2025/26":3,"2026/27":3,"2027/28":5,"tot":19},"Television":{"2022/23":2,"2023/24":3,"2024/25":4,"2025/26":1,"2026/27":1,"2027/28":3,"tot":14},"YFU visit at my school":{"2022/23":0,"2023/24":0,"2024/25":0,"2025/26":0,"2026/27":0,"2027/28":11,"tot":11}},"awr004":[{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Baden-Württemberg","n":143},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Bayern","n":250},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Berlin","n":71},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Brandenburg","n":68},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Bremen","n":33},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Hamburg","n":70},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Hessen","n":62},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Mecklenburg-Vorpommern","n":64},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Niedersachsen","n":200},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Nordrhein-Westfalen","n":299},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Rheinland-Pfalz","n":123},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Saarland","n":49},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Sachsen","n":70},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Sachsen-Anhalt","n":75},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Schleswig Holstein","n":98},{"camp":"Autumn (Aug–Oct)","type":"PPP","bl":"Thüringen","n":44},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Baden-Württemberg","n":784},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Bayern","n":1157},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Brandenburg","n":216},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Bremen","n":45},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Hessen","n":407},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Mecklenburg-Vorpommern","n":192},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Niedersachsen","n":526},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Nordrhein-Westfalen","n":1038},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Rheinland-Pfalz","n":271},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Saarland","n":79},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Sachsen","n":424},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Sachsen-Anhalt","n":216},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Schleswig Holstein","n":206},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Thüringen","n":315},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Baden-Württemberg","n":827},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Brandenburg","n":234},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Bremen","n":49},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Hessen","n":423},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Mecklenburg-Vorpommern","n":198},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Niedersachsen","n":562},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Nordrhein-Westfalen","n":1093},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Rheinland-Pfalz","n":282},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Saarland","n":82},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Sachsen","n":444},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Sachsen-Anhalt","n":226},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Schleswig Holstein","n":221},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Thüringen","n":324}],"awr005":[{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Baden-Württemberg","n":128},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Bayern","n":292},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Berlin","n":276},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Brandenburg","n":55},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Bremen","n":19},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Hamburg","n":164},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Hessen","n":74},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Mecklenburg-Vorpommern","n":31},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Niedersachsen","n":198},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Nordrhein-Westfalen","n":257},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Rheinland-Pfalz","n":38},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Saarland","n":5},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Sachsen","n":61},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Sachsen-Anhalt","n":34},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Schleswig Holstein","n":88},{"camp":"Autumn (Aug–Oct)","type":"Schulausschreibung","bl":"Thüringen","n":20},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Baden-Württemberg","n":143},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Bayern","n":250},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Berlin","n":71},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Brandenburg","n":68},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Bremen","n":33},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Hamburg","n":70},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Hessen","n":62},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Mecklenburg-Vorpommern","n":64},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Niedersachsen","n":200},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Nordrhein-Westfalen","n":299},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Rheinland-Pfalz","n":123},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Saarland","n":49},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Sachsen","n":70},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Sachsen-Anhalt","n":75},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Schleswig Holstein","n":98},{"camp":"Spring (May–Jun)","type":"PPP","bl":"Thüringen","n":44},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Baden-Württemberg","n":81},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Bayern","n":1476},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Berlin","n":275},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Brandenburg","n":36},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Bremen","n":15},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Hamburg","n":152},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Hessen","n":55},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Mecklenburg-Vorpommern","n":25},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Niedersachsen","n":158},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Nordrhein-Westfalen","n":194},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Rheinland-Pfalz","n":26},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Saarland","n":2},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Sachsen","n":40},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Sachsen-Anhalt","n":23},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Schleswig Holstein","n":71},{"camp":"Spring (May–Jun)","type":"Schulausschreibung","bl":"Thüringen","n":11}],"awr006":{"by_month":{"4":5,"5":10,"6":10,"7":2,"8":5,"9":9},"by_type":{"Schulen: Vortrag mit Eltern":16,"Schulen: Schülervortrag":14,"Schulen: Minimesse":9,"Schulen: Pausenstand":2},"mt":{"5":{"Schulen: Pausenstand":1,"Schulen: Vortrag mit Eltern":3,"Schulen: Schülervortrag":4,"Schulen: Minimesse":2},"4":{"Schulen: Vortrag mit Eltern":4,"Schulen: Schülervortrag":1},"9":{"Schulen: Minimesse":3,"Schulen: Vortrag mit Eltern":5,"Schulen: Pausenstand":1},"8":{"Schulen: Minimesse":3,"Schulen: Schülervortrag":1,"Schulen: Vortrag mit Eltern":1},"6":{"Schulen: Vortrag mit Eltern":3,"Schulen: Schülervortrag":6,"Schulen: Minimesse":1},"7":{"Schulen: Schülervortrag":2}}},"con001":{"4":91,"5":73,"6":40,"7":125,"8":110,"9":344},"con003":[{"y":2022,"m":1,"n":199},{"y":2022,"m":2,"n":163},{"y":2022,"m":3,"n":160},{"y":2022,"m":4,"n":155},{"y":2022,"m":5,"n":220},{"y":2022,"m":6,"n":268},{"y":2022,"m":7,"n":212},{"y":2022,"m":8,"n":231},{"y":2022,"m":9,"n":287},{"y":2022,"m":10,"n":226},{"y":2022,"m":11,"n":266},{"y":2022,"m":12,"n":130},{"y":2023,"m":1,"n":248},{"y":2023,"m":2,"n":134},{"y":2023,"m":3,"n":185},{"y":2023,"m":4,"n":178},{"y":2023,"m":5,"n":182},{"y":2023,"m":6,"n":225},{"y":2023,"m":7,"n":180},{"y":2023,"m":8,"n":273},{"y":2023,"m":9,"n":298},{"y":2023,"m":10,"n":223},{"y":2023,"m":11,"n":220},{"y":2023,"m":12,"n":736},{"y":2024,"m":1,"n":196},{"y":2024,"m":2,"n":151},{"y":2024,"m":3,"n":128},{"y":2024,"m":4,"n":154},{"y":2024,"m":5,"n":176},{"y":2024,"m":6,"n":208},{"y":2024,"m":7,"n":196},{"y":2024,"m":8,"n":285},{"y":2024,"m":9,"n":325},{"y":2024,"m":10,"n":242},{"y":2024,"m":11,"n":203},{"y":2024,"m":12,"n":131},{"y":2025,"m":1,"n":272},{"y":2025,"m":2,"n":118},{"y":2025,"m":3,"n":141},{"y":2025,"m":4,"n":120},{"y":2025,"m":5,"n":241},{"y":2025,"m":6,"n":173},{"y":2025,"m":7,"n":245},{"y":2025,"m":8,"n":197},{"y":2025,"m":9,"n":275},{"y":2025,"m":10,"n":282},{"y":2025,"m":11,"n":243},{"y":2025,"m":12,"n":129},{"y":2026,"m":1,"n":213},{"y":2026,"m":2,"n":153},{"y":2026,"m":3,"n":298},{"y":2026,"m":4,"n":124},{"y":2026,"m":5,"n":122},{"y":2026,"m":6,"n":192},{"y":2026,"m":7,"n":160},{"y":2026,"m":8,"n":278},{"y":2026,"m":9,"n":237}],"mkt":{"seasons":["2017/18","2018/19","2022/23","2024/25"],"total":[10460.0,9486.0,10306.0,9287.0],"yfu":[902.0,915.0,767.0,805.0],"countries":{"USA":[4285.0,3734.0,3966.0,3494.0],"Argentina":[77.0,101.0,56.0,56.0],"Australia":[600.0,557.0,472.0,410.0],"Brazil":[36.0,28.0,8.0,24.0],"Chile":[45.0,38.0,32.0,34.0],"China":[38.0,38.0,0.0,11.0],"Costa Rica":[97.0,125.0,97.0,89.0],"Ecuador":[33.0,18.0,15.0,9.0],"France":[100.0,145.0,187.0,239.0],"United Kingdom":[769.0,735.0,387.0,290.0],"Ireland":[641.0,600.0,585.0,425.0],"Italy":[50.0,47.0,247.0,39.0],"Japan":[94.0,91.0,71.0,73.0],"Canada":[1414.0,1619.0,2734.0,2105.0],"New Zealand":[821.0,897.0,676.0,942.0],"Norway":[42.0,56.0,44.0,31.0],"Poland":[3.0,4.0,2.0,4.0],"Sweden":[32.0,42.0,28.0,19.0],"Spain":[110.0,177.0,138.0,184.0],"South Africa":[75.0,65.0,51.0,36.0]}},"aja_seasons":["2017/18","2018/19","2019/20","2020/21","2021/22","2022/23","2023/24","2024/25","2025/26"],"aja_org":{"AFS":[785,737,574,132,491,586,568,480,625],"YFU":[901,915,866,168,617,767,685,805,1066],"Experiment":[464,470,496,248,677,717,696,769,852],"ODI":[95,101,93,35,142,100,112,107,0],"PI":[188,155,202,101,227,228,207,209,193],"RJD":[500,555,486,0,0,363,352,479,422]},"aja_country":{"USA":[1215,1157,1083,150,1049,1012,988,1010,888],"Canada":[206,260,176,4,220,355,272,337,405],"Ireland":[199,169,157,152,217,208,163,153,137],"Argentina":[110,135,98,0,16,70,75,109,102],"France":[45,50,60,55,77,106,92,101,100],"United Kingdom":[80,57,87,95,40,101,53,58,67],"Brazil":[106,99,68,0,0,57,71,115,99],"Belgium":[5,4,3,1,9,10,12,16,495],"Other countries":[967,1002,985,227,526,842,894,950,865]},"aja_bl":{"Nordrhein-Westfalen":[451,421,481,164,467,505,190,551,602],"Niedersachsen":[151,233,355,91,297,402,395,319,365],"Bayern":[287,239,239,69,224,147,398,407,413],"Berlin":[202,226,211,87,201,250,249,197,247],"Baden-Württemberg":[262,240,190,54,194,237,243,193,188],"Hamburg":[212,216,163,36,149,177,163,137,168],"Other Bundesländer":[861,803,588,179,551,672,674,555,691]},"aja_bl_coverage":[2426,2378,2227,680,2083,2390,2312,2359,2674],"en":{"Argentinien":"Argentina","Australien":"Australia","Belgien":"Belgium","Brasilien":"Brazil","Bulgarien":"Bulgaria","Chile":"Chile","China":"China","Costa Rica":"Costa Rica","Dänemark":"Denmark","Ecuador":"Ecuador","Estland":"Estonia","Finnland":"Finland","Frankreich":"France","Großbritannien":"United Kingdom","Indien":"India","Irland":"Ireland","Italien":"Italy","Japan":"Japan","Kanada":"Canada","Lettland":"Latvia","Litauen":"Lithuania","Mexiko":"Mexico","Moldawien":"Moldova","Niederlande":"Netherlands","Norwegen":"Norway","Paraguay":"Paraguay","Polen":"Poland","Rumänien":"Romania","Schweden":"Sweden","Schweiz":"Switzerland","Spanien":"Spain","Südafrika":"South Africa","Thailand":"Thailand","Tschechien":"Czechia","Türkei":"Turkey","USA":"USA","Ungarn":"Hungary","Uruguay":"Uruguay","Österreich":"Austria"},"pm":{"JP":[2659,2661,2397,453,1703,2208,2115,2268,2517],"SP":[274,272,320,231,451,553,505,581,527],"TP":[0,0,0,0,0,0,0,0,114]},"dq":[["YFU Intranet","04_Registration, 05_Application, 06_Contract, 01_Awareness (AWR-006)","'where_did_you_find_out': about 30% of registrations have no answer (shown as 'No answer').","Veronica","Decided — 'No answer' category added"],["Google Analytics (GA4)","02_Interest, 03_Consideration (CON-004)","","Maike",""],["Google Search Console","01_Awareness (AWR-003)","","Maike",""],["Social Media Analytics (Instagram/Facebook/TikTok)","01_Awareness, 02_Interest (INT-004)","Currently collected via manual export; API/connector-based collection has been confirmed as feasible, switch planned.","Miriam","Decided — API switch planned"],["CleverReach","01_Awareness (AWR-004)","Bundesland breakdown only available from the next mailing campaign onward — no historical regional data.","Adrian",""],["Mailing file / Steuerdatei (Letters Sent)","01_Awareness (AWR-005)","Source name inconsistent across documents (\"Mailing Database\" here vs. \"Steuerdatei\" in Veronica's tracking sheet) — to confirm which is correct. Bundesland breakdown forward-looking only.","Adrian","To be confirmed (name check)"],["Market data — Gesamtmarktdaten","08_Market (MKT-001 to MKT-007)","","Thomas",""],["Market data — AJA dataset","08_Market (MKT-008 to MKT-011)","AJA 2025/26: Belgium shows 495 sending participants (YFU 334) vs. ~10 in earlier seasons — likely a source anomaly, to be verified.","Thomas","To be verified"],["Manual tracking sheets (Webinars, School Events, Brochures)","01_Awareness (AWR-006), 03_Consideration (CON-001, CON-003)","","Adrian",""]]};
+const S=D.seasons, F=D.funnel, M=D.mkt;
+const PAL=['#642869','#00B4B9','#8e5a93','#008a8f','#c4a3c8','#7fd8db','#9aa0a6','#d5d8dc','#4d2a63'];
+const P1='#642869',P2='#8e5a93',P3='#c4a3c8',T1='#008a8f',T2='#00B4B9',T3='#7fd8db',GR='#9aa0a6';
+const MON=['Apr','May','Jun','Jul','Aug','Sep'];
+const MON_FULL=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+Chart.defaults.font.size=11; Chart.defaults.plugins.legend.position='bottom'; Chart.defaults.plugins.legend.labels.boxWidth=12;
+const CH={};
+function mk(id,cfg){ if(CH[id])CH[id].destroy(); cfg.options=Object.assign({responsive:true,maintainAspectRatio:false},cfg.options||{}); CH[id]=new Chart(document.getElementById(id),cfg); }
+const GRID={color:'#f0ecf1'};
+const baseScales=()=>({y:{beginAtZero:true,grid:GRID},x:{grid:{display:false}}});
+function show(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));document.getElementById(id).classList.add('on');b.classList.add('on'); window.dispatchEvent(new Event('resize'));}
+const fmt=n=>(n==null||isNaN(n))?'—':Math.round(n).toLocaleString('en-US');
+const f1=n=>(n==null||isNaN(n))?'—':n.toFixed(1);
+const f2=n=>(n==null||isNaN(n))?'—':n.toFixed(2);
+function tPct(cur,prev){ if(prev==null||!prev||cur==null) return '<span class="trend flat">—</span>'; const d=(cur/prev-1)*100; const c=d>0.05?'up':d<-0.05?'down':'flat'; const a=d>0.05?'▲':d<-0.05?'▼':'■'; return `<span class="trend ${c}">${a} ${d>0?'+':''}${d.toFixed(1)}%</span>`; }
+function tPP(cur,prev){ if(prev==null||cur==null) return '<span class="trend flat">—</span>'; const d=cur-prev; const c=d>0.05?'up':d<-0.05?'down':'flat'; const a=d>0.05?'▲':d<-0.05?'▼':'■'; return `<span class="trend ${c}">${a} ${d>0?'+':''}${d.toFixed(1)} pt</span>`; }
+const en=c=>(D.en&&D.en[c])||c;
+const idx=s=>S.indexOf(s);
+const TARGET={'2026/27':750,'2027/28':800};
+function kpiOf(s){ const f=F[s]; return {reg:f.reg,app:f.app,final:f.final,signed:f.signed,wdr:f.wd/f.signed*100,conv:f.final/f.reg*100,succ:f.signed/f.app*100}; }
+function growthOf(s){ const i=idx(s); if(i<1) return null; return (F[s].final/F[S[i-1]].final-1)*100; }
+function card(label,id,value,sub,cls){ return `<div class="card kpi ${cls||''}"><div class="klabel">${label}<span class="id">${id}</span></div><div class="value">${value}</div>${sub}</div>`; }
 
-new Chart(document.getElementById('eg'),{type:'line',data:{labels:['2022/23','2023/24','2024/25','2025/26','2026/27'],datasets:[
- {label:'Final Participants',data:[760,683,808,742,773],borderColor:'#642869',backgroundColor:'rgba(100,40,105,.12)',tension:.3,fill:true},
- {label:'Target (800)',data:[800,800,800,800,800],borderColor:'#9098a1',borderDash:[6,4],pointRadius:0,fill:false}]},options:O});
-
-new Chart(document.getElementById('es'),{type:'bar',data:{labels:['Overall Market','YFU'],datasets:[{label:'Change 2022/23 → 2024/25 (%)',data:[-9.89,4.95],backgroundColor:['#E6004B','#C3D74B'],borderRadius:6}]},options:O});
-
-new Chart(document.getElementById('soc'),{type:'doughnut',data:{labels:['Instagram (example)','TikTok (example)','Facebook (example)'],datasets:[{data:[65000,45000,30000],backgroundColor:['#00B4B9','#F59100','#0AAFE6']}]},options:{plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});
-
-new Chart(document.getElementById('sm'),{type:'bar',data:{labels:['Email Deliveries','Letters Sent'],datasets:[{label:'Volume',data:[12560,6099],backgroundColor:['#00B4B9','#F59100'],borderRadius:6}]},options:O});
-
-new Chart(document.getElementById('web'),{type:'line',data:{labels:['Apr','May','Jun','Jul','Aug','Sep'],datasets:[
- {label:'Users (example)',data:[6200,6800,7100,7600,8000,8400],borderColor:'#00B4B9',backgroundColor:'rgba(0,180,185,.12)',fill:true,tension:.3},
- {label:'Sessions (example)',data:[8100,8900,9300,9900,10500,11200],borderColor:'#0AAFE6',backgroundColor:'rgba(10,175,230,.10)',fill:true,tension:.3}]},options:O});
-
-new Chart(document.getElementById('ch'),{type:'bar',data:{labels:['Webseite','PPP-Online','E-Mail','AJA','PPP-Meldekarte','Telefon','App'],datasets:[{label:'Registrations',data:[23351,6831,382,250,199,174,144],backgroundColor:'#00B4B9',borderRadius:5}]},options:{...O,scales:{...O.scales,y:{...O.scales.y,type:'logarithmic'}}}});
-
-new Chart(document.getElementById('ct'),{type:'bar',data:{labels:['USA','Canada','New Zealand','Ireland','Australia'],datasets:[
- {label:'2022/23',data:[3966,2734,676,585,472],backgroundColor:'#d8cbdb',borderRadius:4},
- {label:'2024/25',data:[3440,2105,942,425,410],backgroundColor:'#642869',borderRadius:4}]},options:{indexAxis:'y',...O}});
-
-new Chart(document.getElementById('cb'),{type:'doughnut',data:{labels:['USA','Canada','New Zealand','Ireland','Australia'],datasets:[{data:[3440,2105,942,425,410],backgroundColor:palette}]},options:{plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});
-
-new Chart(document.getElementById('mv'),{type:'line',data:{labels:['2022/23','2024/25'],datasets:[
- {label:'Market size (Gesamtmarkt)',data:[10306,9287],borderColor:'#005A82',backgroundColor:'rgba(0,90,130,.12)',fill:true,tension:.2},
- {label:'YFU volume',data:[767,805],borderColor:'#642869',backgroundColor:'rgba(100,40,105,.12)',fill:true,tension:.2}]},options:O});
-
-new Chart(document.getElementById('ms'),{type:'line',data:{labels:['2022/23','2024/25'],datasets:[{label:'YFU market share %',data:[7.44,8.67],borderColor:'#642869',backgroundColor:'rgba(100,40,105,.15)',fill:true,tension:.2}]},options:O});
-
-const ajaYears=['2017/18','2018/19','2019/20','2020/21','2021/22','2022/23','2023/24','2024/25','2025/26'];
-new Chart(document.getElementById('aja1'),{type:'bar',data:{labels:ajaYears,datasets:[{label:'Market Size (AJA)',data:[2933,2933,2717,684,2154,2761,2620,2849,3158],backgroundColor:'#F59100',borderRadius:5}]},options:O});
-
-new Chart(document.getElementById('aja2'),{type:'line',data:{labels:ajaYears,datasets:[{label:'YFU Market Share (AJA) %',data:[30.72,31.20,31.87,24.56,28.64,27.78,26.15,28.26,33.76],borderColor:'#C3D74B',backgroundColor:'rgba(195,215,75,.25)',fill:true,tension:.25}]},options:O});
-
-new Chart(document.getElementById('mc'),{type:'line',data:{labels:['2022/23','2024/25'],datasets:[
- {label:'USA',data:[3966,3440],borderColor:'#00B4B9',tension:.2},
- {label:'Canada',data:[2734,2105],borderColor:'#0AAFE6',tension:.2},
- {label:'New Zealand',data:[676,942],borderColor:'#C3D74B',tension:.2}]},options:O});
-
-new Chart(document.getElementById('pm'),{type:'bar',data:{labels:ajaYears,datasets:[
- {label:'JP',data:[2659,2661,2397,453,1703,2208,2115,2268,2517],backgroundColor:'#642869',borderRadius:4},
- {label:'SP',data:[274,272,320,231,451,553,505,581,527],backgroundColor:'#00B4B9',borderRadius:4},
- {label:'TP',data:[0,0,0,0,0,0,0,0,114],backgroundColor:'#F59100',borderRadius:4}]},options:{...O,scales:{y:{beginAtZero:true,stacked:true,grid:{color:'#f0ecf1'}},x:{stacked:true,grid:{display:false}}}}});
+/* ---------- EXECUTIVE ---------- */
+(function(){ const sel=document.getElementById('exeSeason'); S.slice(2).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+(s==='2027/28'?' (in progress)':'');sel.appendChild(o);}); sel.value='2026/27'; })();
+function renderExec(){
+  const s=document.getElementById('exeSeason').value, i=idx(s), p=S[i-1];
+  const k=kpiOf(s), kp=kpiOf(p), g=growthOf(s), gp=growthOf(p);
+  const prog=s==='2027/28';
+  document.getElementById('exeNote').textContent=prog?'Season in progress: figures are to date and not yet comparable with completed seasons.':'Completed season.';
+  const tag=`<span class="season">Season ${s}</span>`;
+  const tgt=TARGET[s];
+  const last3=S.slice(Math.max(0,i-3),i).reverse().map(x=>`${x}: ${fmt(F[x].final)}`).join(' &middot; ');
+  let html=`<div class="card kpi"><div class="klabel">Final Participants<span class="id">CTR-005</span></div><div class="value">${fmt(k.final)}${tPct(k.final,kp.final)}</div>${tag}
+    <div class="prev">Previous season ${p}: ${fmt(kp.final)}</div>
+    ${tgt?`<div class="bar"><i style="width:${Math.min(100,k.final/tgt*100)}%"></i><b style="left:100%"></b></div><div class="note">Target ${fmt(tgt)} &middot; ${f1(k.final/tgt*100)}% reached</div>`:`<div class="note">No target defined for this season</div>`}
+    <div class="note">Earlier: ${last3}</div></div>`;
+  html+=card('Withdrawal Rate','CTR-006',f2(k.wdr)+'%'+tPP(k.wdr,kp.wdr),`${tag}<div class="prev">Previous season ${p}: ${f2(kp.wdr)}%</div><div class="note">${fmt(F[s].wd)} of ${fmt(F[s].signed)} signed contracts</div>`,'p2');
+  html+=card('Participant Growth Rate','EXE-001',(g==null?'—':(g>0?'+':'')+f1(g)+'%')+(gp==null?'':tPP(g,gp)),`${tag}<div class="prev">Previous season ${p}: ${gp==null?'—':(gp>0?'+':'')+f1(gp)+'%'}</div><div class="note">Final Participants vs. previous season</div>`,'p2');
+  html+=card('Overall Funnel Conversion','EXE-002',f2(k.conv)+'%'+tPP(k.conv,kp.conv),`${tag}<div class="prev">Previous season ${p}: ${f2(kp.conv)}%</div><div class="note">Final Participants &divide; Registrations (${fmt(F[s].reg)})</div>`,'t');
+  html+=card('Recruitment Success Rate','EXE-003',f2(k.succ)+'%'+tPP(k.succ,kp.succ),`${tag}<div class="prev">Previous season ${p}: ${f2(kp.succ)}%</div><div class="note">Contracts Signed &divide; Applications Submitted</div>`,'t');
+  document.getElementById('exeCards').innerHTML=html;
+  const seas=S.slice(Math.max(0,i-3),i+1);
+  mk('exeFinal',{type:'bar',data:{labels:seas,datasets:[
+    {label:'Final Participants',data:seas.map(x=>F[x].final),backgroundColor:seas.map(x=>x===s?P1:P3),borderRadius:5},
+    {type:'line',label:'Target',data:seas.map(x=>TARGET[x]||null),borderColor:T1,backgroundColor:T1,pointStyle:'rectRot',pointRadius:8,showLine:false}]},
+    options:{scales:baseScales(),plugins:{tooltip:{callbacks:{afterLabel:c=>{ if(c.datasetIndex!==0)return ''; const j=idx(c.label); return j>0?'vs previous season: '+((F[c.label].final/F[S[j-1]].final-1)*100).toFixed(1)+'%':'';}}}}}});
+}
+function renderExecStatic(){
+  const seas=S.slice(0,5);
+  mk('exeRates',{type:'line',data:{labels:seas,datasets:[
+    {label:'Overall Funnel Conversion (EXE-002) %',data:seas.map(x=>kpiOf(x).conv),borderColor:P1,backgroundColor:P1,tension:.25},
+    {label:'Recruitment Success (EXE-003) %',data:seas.map(x=>kpiOf(x).succ),borderColor:T2,backgroundColor:T2,tension:.25},
+    {label:'Withdrawal Rate (CTR-006) %',data:seas.map(x=>kpiOf(x).wdr),borderColor:P3,backgroundColor:P3,tension:.25}]},options:{scales:baseScales()}});
+  const sh=M.yfu.map((v,i)=>v/M.total[i]*100), L=M.total.length-1;
+  const gm=M.total[L]/M.total[L-1]-1, gy=M.yfu[L]/M.yfu[L-1]-1;
+  const gmp=M.total[L-1]/M.total[L-2]-1, gyp=M.yfu[L-1]/M.yfu[L-2]-1;
+  const t=`<span class="season">Season ${M.seasons[L]} vs. ${M.seasons[L-1]}</span>`;
+  document.getElementById('exeMarket').innerHTML=
+   card('Market Size (Gesamtmarkt)','MKT-001',fmt(M.total[L])+tPct(M.total[L],M.total[L-1]),t+`<div class="prev">${M.seasons[L-1]}: ${fmt(M.total[L-1])}</div>`,'t1')+
+   card('Market Growth Rate','MKT-002',(gm>0?'+':'')+f1(gm*100)+'%'+tPP(gm*100,gmp*100),t+`<div class="prev">Previous interval: ${gmp>0?'+':''}${f1(gmp*100)}%</div>`,'t1')+
+   card('YFU Market Share','MKT-003',f2(sh[L])+'%'+tPP(sh[L],sh[L-1]),t+`<div class="prev">${M.seasons[L-1]}: ${f2(sh[L-1])}%</div>`,'t1')+
+   card('YFU Growth vs. Market','MKT-004',(gy>0?'+':'')+f1(gy*100)+'%'+tPP(gy*100,gyp*100),t+`<div class="prev">Market: ${gm>0?'+':''}${f1(gm*100)}% &middot; previous interval YFU ${gyp>0?'+':''}${f1(gyp*100)}%</div>`,'t1');
+  const lab=M.seasons.slice(1).map((s,i)=>M.seasons[i]+' → '+s);
+  const mg=M.total.slice(1).map((v,i)=>(v/M.total[i]-1)*100), yg=M.yfu.slice(1).map((v,i)=>(v/M.yfu[i]-1)*100);
+  const gcfg=()=>({type:'bar',data:{labels:lab,datasets:[{label:'Overall market %',data:mg,backgroundColor:P3,borderRadius:5},{label:'YFU %',data:yg,backgroundColor:P1,borderRadius:5}]},options:{scales:{y:{grid:GRID},x:{grid:{display:false}}}}});
+  mk('exeMkt',gcfg()); mk('mg',gcfg());
+}
+/* ---------- MARKETING ---------- */
+function renderMarketingStatic(){
+  const aw=D.awr006; document.getElementById('awr006v').textContent=Object.values(aw.by_type).reduce((a,b)=>a+b,0);
+  const reach={Instagram:[14000,15500,17000,18200,19800,21500],TikTok:[8000,9500,11000,12800,14500,16000],Facebook:[4500,4700,4800,5000,5100,5300]};
+  mk('socReach',{type:'bar',data:{labels:MON,datasets:Object.keys(reach).map((k,i)=>({label:k+' (example)',data:reach[k],backgroundColor:[P1,T2,P3][i],borderRadius:3}))},options:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:GRID}}}});
+  mk('impr',{type:'line',data:{labels:MON,datasets:[{label:'Social impressions (example)',data:[32000,36000,41000,45500,50000,55000],borderColor:P1,backgroundColor:P1,tension:.3},{label:'Search impressions (example)',data:[24000,26500,27800,29000,30200,31400],borderColor:T2,backgroundColor:T2,tension:.3}]},options:{scales:baseScales()}});
+  const tset=[...new Set(Object.values(aw.mt).flatMap(o=>Object.keys(o)))];
+  mk('awr006',{type:'bar',data:{labels:MON,datasets:tset.map((t,i)=>({label:t.replace('Schulen: ',''),data:[4,5,6,7,8,9].map(m=>(aw.mt[m]||{})[t]||0),backgroundColor:[P1,T2,P3,T1][i%4],borderRadius:3}))},options:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:GRID,ticks:{precision:0}}}}});
+  mk('web',{type:'line',data:{labels:MON,datasets:[{label:'Users (example)',data:[6200,6800,7100,7600,8000,8400],borderColor:T2,backgroundColor:'rgba(0,180,185,.12)',fill:true,tension:.3},{label:'Sessions (example)',data:[8100,8900,9300,9900,10500,11200],borderColor:P1,backgroundColor:'rgba(100,40,105,.10)',fill:true,tension:.3}]},options:{scales:baseScales()}});
+  const src={'Organic search':[3200,3500,3700,3900,4200,4500],'Social media':[1800,2100,2300,2600,2900,3200],'Email':[900,1000,1000,1100,1200,1300],'Direct':[1500,1600,1700,1800,1900,2000],'QR code':[300,350,400,450,500,550],'Referral':[400,450,500,550,600,650]};
+  mk('traffic',{type:'bar',data:{labels:MON,datasets:Object.keys(src).map((k,i)=>({label:k,data:src[k],backgroundColor:PAL[i]}))},options:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:GRID}}}});
+  mk('igEng',{type:'line',data:{labels:MON,datasets:[{label:'Instagram engagement rate % (example)',data:[9.8,10.2,10.9,11.1,11.5,11.8],borderColor:P1,backgroundColor:P1,tension:.3},{label:'Target 12.5%',data:MON.map(()=>12.5),borderColor:T1,borderDash:[6,4],pointRadius:0}]},options:{scales:baseScales()}});
+  const c=D.con001, cm=[4,5,6,7,8,9]; let run=0; const cum=cm.map(m=>run+=c[m]||0);
+  mk('webinar',{type:'bar',data:{labels:MON,datasets:[{label:'Participants per month',data:cm.map(m=>c[m]||0),backgroundColor:T2,borderRadius:4},{type:'line',label:'Cumulative',data:cum,borderColor:P1,backgroundColor:P1,tension:.2},{type:'line',label:'Season target 1,350',data:cm.map(()=>1350),borderColor:GR,borderDash:[6,4],pointRadius:0}]},options:{scales:baseScales()}});
+  const b=D.con003; document.getElementById('con003v').textContent=fmt(b.reduce((a,x)=>a+x.n,0));
+  mk('brochure',{type:'line',data:{labels:b.map(x=>MON_FULL[x.m-1]+' '+String(x.y).slice(2)),datasets:[{label:'Orders per month',data:b.map(x=>x.n),borderColor:P1,backgroundColor:'rgba(100,40,105,.10)',fill:true,tension:.25,pointRadius:1.5}]},options:{scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{beginAtZero:true,grid:GRID}}}});
+  const chn=D.channels, names=Object.keys(chn).filter(x=>x!=='No answer'); const top=names.slice(0,6);
+  const cats=[...top,'Other channels','No answer'];
+  const sers=S.map(s=>{const tot=F[s].reg; const v=top.map(t=>chn[t][s]); const noans=chn['No answer'][s]; const oth=tot-v.reduce((a,b)=>a+b,0)-noans; return [...v,oth,noans].map(x=>x/tot*100);});
+  mk('chMix',{type:'bar',data:{labels:S,datasets:cats.map((c,i)=>({label:c,data:sers.map(r=>r[i]),backgroundColor:PAL[i%PAL.length]}))},options:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,max:100,grid:GRID,ticks:{callback:v=>v+'%'}}}}});
+  const all=Object.keys(chn);
+  mk('chAll',{type:'bar',data:{labels:all,datasets:[{label:'Registrations',data:all.map(x=>chn[x].tot),backgroundColor:all.map(x=>x==='No answer'?GR:T2),borderRadius:4}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:GRID},y:{grid:{display:false}}}}});
+}
+(function(){ const t=document.getElementById('awType'); [['','All types'],['Schulausschreibung','Schulausschreibung'],['PPP','PPP']].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;t.appendChild(o);});
+  const bl=document.getElementById('awBl'); const set=[...new Set(D.awr004.concat(D.awr005).map(r=>r.bl))].sort(); [['','All Bundesländer'],...set.map(x=>[x,x])].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;bl.appendChild(o);});
+  const rb=document.getElementById('regBl'); [['ALL','All Germany'],...D.states.map(x=>[x,x])].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;rb.appendChild(o);}); })();
+function renderAwr(){
+  const ty=document.getElementById('awType').value, bl=document.getElementById('awBl').value;
+  const f=r=>(!ty||r.type===ty)&&(!bl||r.bl===bl);
+  const camps=['Spring (May–Jun)','Autumn (Aug–Oct)'];
+  const sum=(rows,c)=>rows.filter(f).filter(r=>r.camp===c).reduce((a,r)=>a+r.n,0);
+  const e=camps.map(c=>sum(D.awr004,c)), l=camps.map(c=>sum(D.awr005,c));
+  const tag='<span class="season">Season 2027/28</span>';
+  const sub=(a)=>`${tag}<div class="prev">Spring ${fmt(a[0])} &middot; Autumn ${fmt(a[1])}</div><div class="note">Previous season: no data recorded yet &mdash; trend will appear once available</div>`;
+  const te=e[0]+e[1], tl=l[0]+l[1];
+  document.getElementById('awrCards').innerHTML=card('Email Deliveries','AWR-004',fmt(te),sub(e),'t')+card('Letters Sent','AWR-005',fmt(tl),sub(l),'t')+card('Total Schulausschreibung Volume','AWR-007',fmt(te+tl),sub([e[0]+l[0],e[1]+l[1]]),'t');
+  mk('awrChart',{type:'bar',data:{labels:camps,datasets:[{label:'Emails delivered',data:e,backgroundColor:T2,borderRadius:5},{label:'Letters sent',data:l,backgroundColor:P1,borderRadius:5}]},options:{scales:baseScales()}});
+}
+function renderReg(){
+  const bl=document.getElementById('regBl').value, all=bl==='ALL';
+  const cur='2027/28', c=D.cum[bl];
+  const li=c[cur].reduce((a,v,i)=>v!=null?i:a,0);
+  const mon=['Before Apr','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+  const curV=c[cur][li], prevV=c['2026/27'][li], prev2=c['2025/26'][li];
+  const tag='<span class="season">Season 2027/28 &middot; to '+mon[li]+'</span>';
+  let h=card('Registrations (to date)','REG-001',fmt(curV)+tPct(curV,prevV),tag+`<div class="prev">Same point in 2026/27: ${fmt(prevV)} &middot; 2025/26: ${fmt(prev2)}</div>`,'p2');
+  h+=card('Season target','REG-001',all?fmt(4400):'—',all?`<span class="season">Season 2027/28</span><div class="bar"><i style="width:${Math.min(100,curV/4400*100)}%"></i><b style="left:100%"></b></div><div class="note">${f1(curV/4400*100)}% of target reached to date</div>`:'<div class="note">Target is defined for all of Germany only</div>','p2');
+  h+=card('Last completed season','REG-001',fmt(c['2026/27'][12]),'<span class="season">Season 2026/27</span><div class="prev">Previous: 2025/26 '+fmt(c['2025/26'][12])+' '+tPct(c['2026/27'][12],c['2025/26'][12])+'</div>','p2');
+  const A=F['2026/27'].app, A0=F['2025/26'].app;
+  h+=card('Applications submitted','APP-001',fmt(A)+tPct(A,A0),`<span class="season">Season 2026/27</span><div class="prev">Previous season 2025/26: ${fmt(A0)}</div><div class="note">2027/28 in progress: ${fmt(F['2027/28'].app)} so far</div>`,'p2');
+  document.getElementById('regCards').innerHTML=h;
+  document.getElementById('regNote').textContent=all?'All of Germany':'Filtered to '+bl+' (Bundesland of the registration)';
+  const cols={'2024/25':T3,'2025/26':T2,'2026/27':P2,'2027/28':P1};
+  const ds=Object.keys(cols).map(s=>({label:s+(s===cur?' (current)':''),data:c[s],borderColor:cols[s],backgroundColor:cols[s],tension:.2,borderWidth:s===cur?3.5:1.8,pointRadius:s===cur?3:0,spanGaps:false}));
+  if(all) ds.push({label:'Target 2027/28 (4,400)',data:mon.map(()=>4400),borderColor:GR,borderDash:[6,4],pointRadius:0,borderWidth:1.5});
+  mk('regCum',{type:'line',data:{labels:mon,datasets:ds},options:{scales:baseScales()}});
+}
+/* ---------- FUNNEL ---------- */
+(function(){ const sel=document.getElementById('funSeason'); ['All seasons',...S].forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+(s==='2027/28'?' (in progress)':'');sel.appendChild(o);}); sel.value='2026/27'; })();
+function aggF(s){ if(s==='All seasons'){const a={reg:0,app:0,cons:0,sent:0,signed:0,wd:0,final:0,inv:0,att:0}; S.forEach(x=>Object.keys(a).forEach(k=>a[k]+=F[x][k])); return a;} return F[s]; }
+function renderFun(){
+  const s=document.getElementById('funSeason').value, a=aggF(s), i=idx(s), pa=i>0?F[S[i-1]]:null;
+  document.getElementById('funMuted').textContent=(s==='All seasons'?'All seasons combined (2022/23–2027/28)':'Season '+s)+' · YFU Intranet export, person-level';
+  const steps=[['Registrations','REG-001',a.reg],['Applications','APP-001',a.app],['Contracts Sent','CTR-001',a.sent],['Contracts Signed','CTR-002',a.signed],['Withdrawals (post-signature)','CTR-004',a.wd],['Final Participants','CTR-005',a.final]];
+  const cols=['#642869','#7d4a82','#5f6aa6','#2d8fb0','#00A5AB','#00B4B9'];
+  document.getElementById('funnel').innerHTML=steps.map((st,j)=>{const w=Math.max(34,st[2]/a.reg*100); return `<div class="step" style="width:${w}%;background:${cols[j]}"><span>${st[0]}<small>${st[1]}</small></span><span>${fmt(st[2])}<span class="arrow">${j?f1(st[2]/a.reg*100)+'% of reg.':'100%'}</span></span></div>`;}).join('');
+  const P=pa;
+  const rows=[['Registrations','REG-001',a.reg,P&&P.reg,0],['Applications','APP-001',a.app,P&&P.app,0],['Parent Consent Forms uploaded','APP-002',a.cons,P&&P.cons,0],['Contracts Sent','CTR-001',a.sent,P&&P.sent,0],['Contracts Signed','CTR-002',a.signed,P&&P.signed,0],['Final Participants','CTR-005',a.final,P&&P.final,0],
+   ['Registration-to-Application Conversion','APP-006',a.app/a.reg*100,P&&P.app/P.reg*100,1],['Application Completion Rate','APP-003',a.cons/a.app*100,P&&P.cons/P.app*100,1],['Intro Meeting Attendance Rate','APP-005',a.att/a.inv*100,P&&P.att/P.inv*100,1],['Contract Acceptance Rate','CTR-003',a.signed/a.sent*100,P&&P.signed/P.sent*100,1],['Withdrawal Rate','CTR-006',a.wd/a.signed*100,P&&P.wd/P.signed*100,1],['Overall Funnel Conversion','EXE-002',a.final/a.reg*100,P&&P.final/P.reg*100,1],['Recruitment Success Rate','EXE-003',a.signed/a.app*100,P&&P.signed/P.app*100,1]];
+  document.getElementById('funTable').innerHTML='<tr><th>KPI</th><th class="n">'+(s==='All seasons'?'All':s)+'</th><th class="n">Previous</th><th>Trend</th></tr>'+rows.map(r=>`<tr><td>${r[0]} <span style="color:#b0a8b3;font-size:11px">${r[1]}</span></td><td class="n"><b>${r[4]?f2(r[2])+'%':fmt(r[2])}</b></td><td class="n">${r[3]==null?'—':(r[4]?f2(r[3])+'%':fmt(r[3]))}</td><td>${r[3]==null?'<span class="trend flat">—</span>':(r[4]?tPP(r[2],r[3]):tPct(r[2],r[3]))}</td></tr>`).join('');
+}
+/* ---------- COUNTRIES ---------- */
+(function(){ const sel=document.getElementById('couSeason'); S.slice(1).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+(s==='2027/28'?' (in progress)':'');sel.appendChild(o);}); sel.value='2026/27'; })();
+function renderCou(){
+  const m=document.getElementById('couMetric').value, s=document.getElementById('couSeason').value, p=S[idx(s)-1];
+  const src=m==='app'?D.c_app:D.c_fin, none=m==='app'?D.c_app_none:D.c_fin_none;
+  const rows=Object.keys(src).map(c=>({c:en(c),cur:src[c][s]||0,pre:src[c][p]||0})).filter(r=>r.cur||r.pre).sort((a,b)=>b.cur-a.cur||b.pre-a.pre);
+  document.getElementById('couTitle').textContent=(m==='app'?'Applications by first-choice country (APP-001)':'Final Participants by country (CTR-005)')+' — '+s+' vs. '+p;
+  document.getElementById('couNote').textContent=m==='app'?fmt(none[s])+' applications in '+s+' have no first-choice country recorded and are not shown by country.':'Country of the signed programme.';
+  document.getElementById('couBox').style.height=Math.max(320,rows.length*24+80)+'px';
+  mk('couChart',{type:'bar',data:{labels:rows.map(r=>r.c),datasets:[{label:p,data:rows.map(r=>r.pre),backgroundColor:P3,borderRadius:3},{label:s,data:rows.map(r=>r.cur),backgroundColor:P1,borderRadius:3}]},options:{indexAxis:'y',scales:{x:{grid:GRID},y:{grid:{display:false},ticks:{autoSkip:false,font:{size:10}}}}}});
+  document.getElementById('couTable').innerHTML='<tr><th>Country</th><th class="n">'+s+'</th><th class="n">'+p+'</th><th>Change</th></tr>'+rows.map(r=>`<tr><td>${r.c}</td><td class="n"><b>${fmt(r.cur)}</b></td><td class="n">${fmt(r.pre)}</td><td>${r.pre?tPct(r.cur,r.pre):'<span class="trend up">new</span>'}</td></tr>`).join('');
+}
+function renderCouStatic(){
+  const mc=M.countries, names=Object.keys(mc).sort((a,b)=>mc[b][3]-mc[a][3]); const top=names.slice(0,8);
+  mk('couMkt',{type:'line',data:{labels:M.seasons,datasets:top.map((c,i)=>({label:c,data:mc[c],borderColor:PAL[i],backgroundColor:PAL[i],tension:.2}))},options:{scales:baseScales()}});
+  document.getElementById('couMktTable').innerHTML='<tr><th>Country</th><th class="n">2022/23</th><th class="n">2024/25</th><th>Change</th></tr>'+names.map(c=>`<tr><td>${c}</td><td class="n">${fmt(mc[c][2])}</td><td class="n"><b>${fmt(mc[c][3])}</b></td><td>${mc[c][2]?tPct(mc[c][3],mc[c][2]):'<span class="trend up">new</span>'}</td></tr>`).join('');
+  const ac=D.aja_country, keys=Object.keys(ac);
+  mk('couAja',{type:'bar',data:{labels:D.aja_seasons,datasets:keys.map((k,i)=>({label:k,data:ac[k],backgroundColor:PAL[i%PAL.length]}))},options:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:GRID}}}});
+}
+/* ---------- MARKET ---------- */
+function renderMarketStatic(){
+  const L=M.total.length-1, sh=M.yfu.map((v,i)=>v/M.total[i]*100);
+  const gm=M.total[L]/M.total[L-1]-1, gy=M.yfu[L]/M.yfu[L-1]-1, gmp=M.total[L-1]/M.total[L-2]-1, gyp=M.yfu[L-1]/M.yfu[L-2]-1;
+  const t=`<span class="season">Season ${M.seasons[L]} vs. ${M.seasons[L-1]}</span>`;
+  document.getElementById('mktCards').innerHTML=
+   card('Market Size','MKT-001',fmt(M.total[L])+tPct(M.total[L],M.total[L-1]),t+`<div class="prev">${M.seasons[L-1]}: ${fmt(M.total[L-1])}</div>`,'t1')+
+   card('Market Growth Rate','MKT-002',(gm>0?'+':'')+f1(gm*100)+'%'+tPP(gm*100,gmp*100),t+`<div class="prev">Previous interval ${gmp>0?'+':''}${f1(gmp*100)}%</div>`,'t1')+
+   card('YFU Market Share','MKT-003',f2(sh[L])+'%'+tPP(sh[L],sh[L-1]),t+`<div class="prev">${M.seasons[L-1]}: ${f2(sh[L-1])}%</div>`,'t1')+
+   card('YFU Growth vs. Market Growth','MKT-004',(gy>0?'+':'')+f1(gy*100)+'%'+tPP(gy*100,gyp*100),t+`<div class="prev">Market ${gm>0?'+':''}${f1(gm*100)}%</div>`,'t1');
+  mk('mv',{type:'bar',data:{labels:M.seasons,datasets:[{label:'Market size (Gesamtmarkt)',data:M.total,backgroundColor:T2,borderRadius:5,yAxisID:'y'},{type:'line',label:'YFU volume',data:M.yfu,borderColor:P1,backgroundColor:P1,tension:.2,yAxisID:'y1'}]},options:{scales:{y:{beginAtZero:true,grid:GRID,title:{display:true,text:'Market'}},y1:{beginAtZero:true,position:'right',grid:{display:false},title:{display:true,text:'YFU'}},x:{grid:{display:false}}}}});
+  mk('ms',{type:'line',data:{labels:M.seasons,datasets:[{label:'YFU market share %',data:sh,borderColor:P1,backgroundColor:'rgba(100,40,105,.12)',fill:true,tension:.2}]},options:{scales:baseScales()}});
+  const A=D.aja_seasons, tot=A.map((s,i)=>Object.values(D.aja_org).reduce((a,v)=>a+v[i],0)), y=D.aja_org['YFU'];
+  const j=A.length-1, ag=(tot[j]/tot[j-1]-1)*100, agp=(tot[j-1]/tot[j-2]-1)*100, yg=(y[j]/y[j-1]-1)*100, ygp=(y[j-1]/y[j-2]-1)*100, ash=y.map((v,i)=>v/tot[i]*100);
+  const at=`<span class="season">Season ${A[j]} vs. ${A[j-1]}</span>`;
+  document.getElementById('ajaCards').innerHTML=
+   card('Market Size (AJA)','MKT-008',fmt(tot[j])+tPct(tot[j],tot[j-1]),at+`<div class="prev">${A[j-1]}: ${fmt(tot[j-1])}</div>`,'p2')+
+   card('Market Growth Rate (AJA)','MKT-009',(ag>0?'+':'')+f1(ag)+'%'+tPP(ag,agp),at+`<div class="prev">Previous season: ${agp>0?'+':''}${f1(agp)}%</div>`,'p2')+
+   card('YFU Market Share (AJA)','MKT-010',f2(ash[j])+'%'+tPP(ash[j],ash[j-1]),at+`<div class="prev">${A[j-1]}: ${f2(ash[j-1])}%</div>`,'p2')+
+   card('YFU Growth vs. AJA Growth','MKT-011',(yg>0?'+':'')+f1(yg)+'%'+tPP(yg,ygp),at+`<div class="prev">AJA market ${ag>0?'+':''}${f1(ag)}% &middot; previous season YFU ${ygp>0?'+':''}${f1(ygp)}%</div>`,'p2');
+  mk('aja2',{type:'line',data:{labels:A,datasets:[{label:'YFU market share (AJA) %',data:ash,borderColor:T2,backgroundColor:'rgba(0,180,185,.15)',fill:true,tension:.25}]},options:{scales:baseScales()}});
+  const mgr=tot.slice(1).map((v,i)=>(v/tot[i]-1)*100), ygr=y.slice(1).map((v,i)=>(v/y[i]-1)*100);
+  mk('aja3',{type:'bar',data:{labels:A.slice(1),datasets:[{label:'AJA market %',data:mgr,backgroundColor:P3,borderRadius:4},{label:'YFU %',data:ygr,backgroundColor:P1,borderRadius:4}]},options:{scales:{y:{grid:GRID},x:{grid:{display:false}}}}});
+  const jp=D.pm.JP, sp=D.pm.SP, tp=D.pm.TP, n=jp.length-1, tt=k=>jp[k]+sp[k]+tp[k];
+  const pt=`<span class="season">Season ${A[n]} vs. ${A[n-1]}</span>`;
+  document.getElementById('pmCard').innerHTML=
+   card('Year programmes (JP)','MKT-006',f1(jp[n]/tt(n)*100)+'%'+tPP(jp[n]/tt(n)*100,jp[n-1]/tt(n-1)*100),pt+`<div class="prev">${A[n-1]}: ${f1(jp[n-1]/tt(n-1)*100)}%</div>`,'t1')+
+   card('Semester programmes (SP)','MKT-006',f1(sp[n]/tt(n)*100)+'%'+tPP(sp[n]/tt(n)*100,sp[n-1]/tt(n-1)*100),pt+`<div class="prev">${A[n-1]}: ${f1(sp[n-1]/tt(n-1)*100)}%</div>`,'t1')+
+   card('Short-term programmes (TP)','MKT-006',f1(tp[n]/tt(n)*100)+'%'+tPP(tp[n]/tt(n)*100,tp[n-1]/tt(n-1)*100),pt+`<div class="prev">${A[n-1]}: ${f1(tp[n-1]/tt(n-1)*100)}%</div>`,'t1');
+  mk('pm',{type:'bar',data:{labels:A,datasets:[{label:'JP',data:jp,backgroundColor:P1,borderRadius:3},{label:'SP',data:sp,backgroundColor:T2,borderRadius:3},{label:'TP',data:tp,backgroundColor:P3,borderRadius:3}]},options:{scales:{y:{stacked:true,grid:GRID},x:{stacked:true,grid:{display:false}}}}});
+}
+function renderAja(){
+  const sp=document.getElementById('ajaSplit').value, A=D.aja_seasons;
+  const totA=A.map((s,i)=>Object.values(D.aja_org).reduce((a,v)=>a+v[i],0));
+  let ds,note='';
+  if(sp==='none'){ds=[{label:'Market Size (AJA)',data:totA,backgroundColor:P1,borderRadius:4}];}
+  else{ const src=sp==='org'?D.aja_org:sp==='country'?D.aja_country:D.aja_bl; ds=Object.keys(src).map((k,i)=>({label:k,data:src[k],backgroundColor:PAL[i%PAL.length]}));
+    if(sp==='bl') note='Bundesland is recorded for part of the total only ('+Math.round(D.aja_bl_coverage[A.length-1]/totA[A.length-1]*100)+'% in 2025/26).'; }
+  document.getElementById('ajaNote').textContent=note;
+  mk('aja1',{type:'bar',data:{labels:A,datasets:ds},options:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:GRID}}}});
+}
+/* ---------- DATA QUALITY ---------- */
+function renderDq(){
+  const badge=t=>t?`<span class="badge b-t">${t}</span>`:'—';
+  document.getElementById('dqTable').innerHTML='<tr><th>Data Source</th><th>Feeds</th><th>Known Issue</th><th>Owner</th><th>Conclusion</th></tr>'+D.dq.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]||'—'}</td><td>${r[3]}</td><td>${badge(r[4])}</td></tr>`).join('');
+}
+renderExecStatic(); renderExec(); renderMarketingStatic(); renderAwr(); renderReg(); renderFun(); renderCou(); renderCouStatic(); renderMarketStatic(); renderAja(); renderDq();
 </script></body></html>
