@@ -93,8 +93,7 @@ tr:hover td{background:#faf8fb}
     </div>
     <div class="pillbar">
       <div class="pill"><span class="dot" style="background:#7fd8db"></span>43 KPIs total</div>
-      <div class="pill"><span class="dot" style="background:#7fd8db"></span>40 validated</div>
-      <div class="pill"><span class="dot" style="background:#c4a3c8"></span>1 partial</div>
+      <div class="pill"><span class="dot" style="background:#7fd8db"></span>41 validated</div>
       <div class="pill"><span class="dot" style="background:#fff"></span>2 rejected</div>
     </div>
   </div>
@@ -112,9 +111,9 @@ tr:hover td{background:#faf8fb}
 <div class="grid" style="margin-top:16px">
 <div class="card wide"><div class="title">Final Participants &mdash; selected season vs. previous seasons</div><div class="muted">CTR-005 &middot; up to 3 previous seasons &middot; targets: 750 (2026/27), 800 (2027/28), none before</div><div class="chartbox"><canvas id="exeFinal"></canvas></div></div>
 <div class="card wide"><div class="title">Funnel rates by season</div><div class="muted">EXE-002, EXE-003, CTR-006 &middot; completed seasons only</div><div class="chartbox"><canvas id="exeRates"></canvas></div></div>
-<div class="sectionhead">Market context</div>
+<div class="sectionhead">Market context &mdash; AJA (nonprofit exchange organisations)</div>
 <div id="exeMarket" style="display:contents"></div>
-<div class="card full"><div class="title">YFU vs. overall market &mdash; change between available seasons</div><div class="muted">MKT-002 vs. MKT-004 &middot; Gesamtmarktdaten (seasons with data: 2017/18, 2018/19, 2022/23, 2024/25)</div><div class="chartbox"><canvas id="exeMkt"></canvas></div></div>
+<div class="card full"><div class="title">YFU vs. AJA market &mdash; growth by season</div><div class="muted">MKT-009 vs. MKT-011 &middot; AJA dataset, change vs. previous season &middot; overall market (Gesamtmarkt) metrics are on the Market page</div><div class="chartbox"><canvas id="exeMkt"></canvas></div></div>
 </div></section>
 
 <!-- MARKETING -->
@@ -275,19 +274,19 @@ function renderExecStatic(){
     {label:'Overall Funnel Conversion (EXE-002) %',data:seas.map(x=>kpiOf(x).conv),borderColor:P1,backgroundColor:P1,tension:.25},
     {label:'Recruitment Success (EXE-003) %',data:seas.map(x=>kpiOf(x).succ),borderColor:T2,backgroundColor:T2,tension:.25},
     {label:'Withdrawal Rate (CTR-006) %',data:seas.map(x=>kpiOf(x).wdr),borderColor:P3,backgroundColor:P3,tension:.25}]},options:{scales:baseScales()}});
-  const sh=M.yfu.map((v,i)=>v/M.total[i]*100), L=M.total.length-1;
-  const gm=M.total[L]/M.total[L-1]-1, gy=M.yfu[L]/M.yfu[L-1]-1;
-  const gmp=M.total[L-1]/M.total[L-2]-1, gyp=M.yfu[L-1]/M.yfu[L-2]-1;
-  const t=`<span class="season">Season ${M.seasons[L]} vs. ${M.seasons[L-1]}</span>`;
+  const A=D.aja_seasons, tot=A.map((s,i)=>Object.values(D.aja_org).reduce((a,v)=>a+v[i],0)), y=D.aja_org['YFU'];
+  const j=A.length-1, ag=(tot[j]/tot[j-1]-1)*100, agp=(tot[j-1]/tot[j-2]-1)*100, yg=(y[j]/y[j-1]-1)*100, ygp=(y[j-1]/y[j-2]-1)*100, ash=y.map((v,i)=>v/tot[i]*100);
+  const at=`<span class="season">Season ${A[j]} vs. ${A[j-1]}</span>`;
   document.getElementById('exeMarket').innerHTML=
-   card('Market Size (Gesamtmarkt)','MKT-001',fmt(M.total[L])+tPct(M.total[L],M.total[L-1]),t+`<div class="prev">${M.seasons[L-1]}: ${fmt(M.total[L-1])}</div>`,'t1')+
-   card('Market Growth Rate','MKT-002',(gm>0?'+':'')+f1(gm*100)+'%'+tPP(gm*100,gmp*100),t+`<div class="prev">Previous interval: ${gmp>0?'+':''}${f1(gmp*100)}%</div>`,'t1')+
-   card('YFU Market Share','MKT-003',f2(sh[L])+'%'+tPP(sh[L],sh[L-1]),t+`<div class="prev">${M.seasons[L-1]}: ${f2(sh[L-1])}%</div>`,'t1')+
-   card('YFU Growth vs. Market','MKT-004',(gy>0?'+':'')+f1(gy*100)+'%'+tPP(gy*100,gyp*100),t+`<div class="prev">Market: ${gm>0?'+':''}${f1(gm*100)}% &middot; previous interval YFU ${gyp>0?'+':''}${f1(gyp*100)}%</div>`,'t1');
+   card('Market Size (AJA)','MKT-008',fmt(tot[j])+tPct(tot[j],tot[j-1]),at+`<div class="prev">${A[j-1]}: ${fmt(tot[j-1])}</div>`,'t1')+
+   card('Market Growth Rate (AJA)','MKT-009',(ag>0?'+':'')+f1(ag)+'%'+tPP(ag,agp),at+`<div class="prev">Previous season: ${agp>0?'+':''}${f1(agp)}%</div>`,'t1')+
+   card('YFU Market Share (AJA)','MKT-010',f2(ash[j])+'%'+tPP(ash[j],ash[j-1]),at+`<div class="prev">${A[j-1]}: ${f2(ash[j-1])}%</div>`,'t1')+
+   card('YFU Growth vs. AJA Growth','MKT-011',(yg>0?'+':'')+f1(yg)+'%'+tPP(yg,ygp),at+`<div class="prev">AJA market ${ag>0?'+':''}${f1(ag)}% &middot; previous season YFU ${ygp>0?'+':''}${f1(ygp)}%</div>`,'t1');
+  const mgr=tot.slice(1).map((v,i)=>(v/tot[i]-1)*100), ygr=y.slice(1).map((v,i)=>(v/y[i]-1)*100);
+  mk('exeMkt',{type:'bar',data:{labels:A.slice(1),datasets:[{label:'AJA market %',data:mgr,backgroundColor:P3,borderRadius:5},{label:'YFU %',data:ygr,backgroundColor:P1,borderRadius:5}]},options:{scales:{y:{grid:GRID},x:{grid:{display:false}}}}});
   const lab=M.seasons.slice(1).map((s,i)=>M.seasons[i]+' → '+s);
-  const mg=M.total.slice(1).map((v,i)=>(v/M.total[i]-1)*100), yg=M.yfu.slice(1).map((v,i)=>(v/M.yfu[i]-1)*100);
-  const gcfg=()=>({type:'bar',data:{labels:lab,datasets:[{label:'Overall market %',data:mg,backgroundColor:P3,borderRadius:5},{label:'YFU %',data:yg,backgroundColor:P1,borderRadius:5}]},options:{scales:{y:{grid:GRID},x:{grid:{display:false}}}}});
-  mk('exeMkt',gcfg()); mk('mg',gcfg());
+  const mg=M.total.slice(1).map((v,i)=>(v/M.total[i]-1)*100), yg2=M.yfu.slice(1).map((v,i)=>(v/M.yfu[i]-1)*100);
+  mk('mg',{type:'bar',data:{labels:lab,datasets:[{label:'Overall market %',data:mg,backgroundColor:P3,borderRadius:5},{label:'YFU %',data:yg2,backgroundColor:P1,borderRadius:5}]},options:{scales:{y:{grid:GRID},x:{grid:{display:false}}}}});
 }
 /* ---------- MARKETING ---------- */
 function renderMarketingStatic(){
