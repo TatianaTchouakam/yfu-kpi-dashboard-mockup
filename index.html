@@ -155,7 +155,7 @@ tr:hover td{background:#faf8fb}
 <div class="full" style="grid-column:1/-1"><div class="filters" style="margin:0"><label>Bundesland<select id="regBl" onchange="renderReg()"></select></label><span class="note" style="margin:0" id="regNote"></span></div></div>
 <div id="regCards" style="display:contents"></div>
 <div class="card wide"><div class="title">Registrations &mdash; cumulative over the recruitment season</div><div class="muted">REG-001 &middot; current season vs. target and previous seasons &middot; real figures</div><div class="chartbox" style="height:300px"><canvas id="regCum"></canvas></div></div>
-<div class="card wide"><div class="title">Registrations by Channel &mdash; mix by season</div><div class="muted">REG-002 &middot; self-reported "Wo hast du von YFU erfahren" &middot; labels harmonised, blanks = "No answer"</div><div class="chartbox" style="height:300px"><canvas id="chMix"></canvas></div></div>
+<div class="card wide"><div class="title">Registrations by Channel &mdash; selected season vs. previous season</div><div class="muted">REG-002 &middot; share of registrations per channel &middot; self-reported "Wo hast du von YFU erfahren" &middot; "No answer" = no channel given</div><div class="filters" style="margin:0 0 6px"><label>Season<select id="chSeason" onchange="renderCh()"></select></label></div><div class="chartbox" style="height:340px"><canvas id="chMix"></canvas></div></div>
 <div class="card full"><div class="title">Registrations by Channel &mdash; all seasons</div><div class="muted">REG-002 &middot; all seasons combined</div><div class="chartbox" style="height:420px"><canvas id="chAll"></canvas></div></div>
 </div></section>
 
@@ -165,6 +165,7 @@ tr:hover td{background:#faf8fb}
 <div class="filters"><label>Season<select id="funSeason" onchange="renderFun()"></select></label><span class="note" style="margin:0">Programme, destination, Bundesland and channel filters will be added in Power BI.</span></div>
 <div class="grid"><div class="card wide"><div class="title">Funnel overview</div><div class="muted" id="funMuted"></div><div class="funnel" id="funnel"></div></div>
 <div class="card wide"><div class="title">Funnel KPIs &mdash; selected season vs. previous season</div><div class="muted">All Ready</div><div class="scroll"><table id="funTable"></table></div></div>
+<div class="card full"><div class="title">Registrations by Channel &mdash; selected season vs. previous season</div><div class="muted">REG-002 &middot; follows the season selected above &middot; share of registrations per channel &middot; "No answer" = no channel given</div><div class="chartbox" style="height:380px"><canvas id="funCh"></canvas></div></div>
 </div></section>
 
 <!-- COUNTRIES -->
@@ -304,13 +305,26 @@ function renderMarketingStatic(){
   mk('webinar',{type:'bar',data:{labels:MON,datasets:[{label:'Participants per month',data:cm.map(m=>c[m]||0),backgroundColor:T2,borderRadius:4},{type:'line',label:'Cumulative',data:cum,borderColor:P1,backgroundColor:P1,tension:.2},{type:'line',label:'Season target 1,350',data:cm.map(()=>1350),borderColor:GR,borderDash:[6,4],pointRadius:0}]},options:{scales:baseScales()}});
   const b=D.con003; document.getElementById('con003v').textContent=fmt(b.reduce((a,x)=>a+x.n,0));
   mk('brochure',{type:'line',data:{labels:b.map(x=>MON_FULL[x.m-1]+' '+String(x.y).slice(2)),datasets:[{label:'Orders per month',data:b.map(x=>x.n),borderColor:P1,backgroundColor:'rgba(100,40,105,.10)',fill:true,tension:.25,pointRadius:1.5}]},options:{scales:{x:{grid:{display:false},ticks:{maxTicksLimit:12}},y:{beginAtZero:true,grid:GRID}}}});
-  const chn=D.channels, names=Object.keys(chn).filter(x=>x!=='No answer'); const top=names.slice(0,6);
-  const cats=[...top,'Other channels','No answer'];
-  const sers=S.map(s=>{const tot=F[s].reg; const v=top.map(t=>chn[t][s]); const noans=chn['No answer'][s]; const oth=tot-v.reduce((a,b)=>a+b,0)-noans; return [...v,oth,noans].map(x=>x/tot*100);});
-  mk('chMix',{type:'bar',data:{labels:S,datasets:cats.map((c,i)=>({label:c,data:sers.map(r=>r[i]),backgroundColor:PAL[i%PAL.length]}))},options:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,max:100,grid:GRID,ticks:{callback:v=>v+'%'}}}}});
+  const chn=D.channels;
   const all=Object.keys(chn);
   mk('chAll',{type:'bar',data:{labels:all,datasets:[{label:'Registrations',data:all.map(x=>chn[x].tot),backgroundColor:all.map(x=>x==='No answer'?GR:T2),borderRadius:4}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:GRID},y:{grid:{display:false}}}}});
 }
+(function(){ const cs=document.getElementById('chSeason'); S.slice(1).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s+(s==='2027/28'?' (in progress)':'');cs.appendChild(o);}); cs.value='2027/28'; })();
+function chRows(s){
+  const chn=D.channels, top=Object.keys(chn).filter(x=>x!=='No answer').slice(0,8);
+  const tot=x=>x==='All seasons'?S.reduce((a,y)=>a+F[y].reg,0):F[x].reg;
+  const cnt=(k,x)=>x==='All seasons'?chn[k].tot:chn[k][x];
+  const build=x=>{ if(!x) return null; const t=tot(x); const r=top.map(k=>[k,cnt(k,x)]); const o=t-r.reduce((a,b)=>a+b[1],0)-cnt('No answer',x); return [...r,['Other channels',o],['No answer',cnt('No answer',x)]].map(([k,c])=>({k:k,c:c,pct:c/t*100})); };
+  const p=(s==='All seasons'||idx(s)<1)?null:S[idx(s)-1];
+  return {cur:build(s),pre:build(p),p:p};
+}
+function renderChBars(canvasId,s){
+  const r=chRows(s), labels=r.cur.map(x=>x.k), ds=[];
+  if(r.pre) ds.push({label:r.p,data:r.pre.map(x=>x.pct),counts:r.pre.map(x=>x.c),backgroundColor:P3,borderRadius:3});
+  ds.push({label:s,data:r.cur.map(x=>x.pct),counts:r.cur.map(x=>x.c),backgroundColor:P1,borderRadius:3});
+  mk(canvasId,{type:'bar',data:{labels:labels,datasets:ds},options:{indexAxis:'y',scales:{x:{grid:GRID,ticks:{callback:v=>v+'%'}},y:{grid:{display:false},ticks:{autoSkip:false}}},plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.x.toFixed(1)+'% ('+fmt(c.dataset.counts[c.dataIndex])+' registrations)'}}}}});
+}
+function renderCh(){ renderChBars('chMix',document.getElementById('chSeason').value); }
 (function(){ const t=document.getElementById('awType'); [['','All types'],['Schulausschreibung','Schulausschreibung'],['PPP','PPP']].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;t.appendChild(o);});
   const bl=document.getElementById('awBl'); const set=[...new Set(D.awr004.concat(D.awr005).map(r=>r.bl))].sort(); [['','All Bundesländer'],...set.map(x=>[x,x])].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;bl.appendChild(o);});
   const rb=document.getElementById('regBl'); [['ALL','All Germany'],...D.states.map(x=>[x,x])].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;rb.appendChild(o);}); })();
@@ -354,6 +368,7 @@ function renderFun(){
   const steps=[['Registrations','REG-001',a.reg],['Applications','APP-001',a.app],['Contracts Sent','CTR-001',a.sent],['Contracts Signed','CTR-002',a.signed],['Withdrawals (post-signature)','CTR-004',a.wd],['Final Participants','CTR-005',a.final]];
   const cols=['#642869','#7d4a82','#5f6aa6','#2d8fb0','#00A5AB','#00B4B9'];
   document.getElementById('funnel').innerHTML=steps.map((st,j)=>{const w=Math.max(34,st[2]/a.reg*100); return `<div class="step" style="width:${w}%;background:${cols[j]}"><span>${st[0]}<small>${st[1]}</small></span><span>${fmt(st[2])}<span class="arrow">${j?f1(st[2]/a.reg*100)+'% of reg.':'100%'}</span></span></div>`;}).join('');
+  renderChBars('funCh',s);
   const P=pa;
   const rows=[['Registrations','REG-001',a.reg,P&&P.reg,0],['Applications','APP-001',a.app,P&&P.app,0],['Parent Consent Forms uploaded','APP-002',a.cons,P&&P.cons,0],['Contracts Sent','CTR-001',a.sent,P&&P.sent,0],['Contracts Signed','CTR-002',a.signed,P&&P.signed,0],['Final Participants','CTR-005',a.final,P&&P.final,0],
    ['Registration-to-Application Conversion','APP-006',a.app/a.reg*100,P&&P.app/P.reg*100,1],['Application Completion Rate','APP-003',a.cons/a.app*100,P&&P.cons/P.app*100,1],['Intro Meeting Attendance Rate','APP-005',a.att/a.inv*100,P&&P.att/P.inv*100,1],['Contract Acceptance Rate','CTR-003',a.signed/a.sent*100,P&&P.signed/P.sent*100,1],['Withdrawal Rate','CTR-006',a.wd/a.signed*100,P&&P.wd/P.signed*100,1],['Overall Funnel Conversion','EXE-002',a.final/a.reg*100,P&&P.final/P.reg*100,1],['Recruitment Success Rate','EXE-003',a.signed/a.app*100,P&&P.signed/P.app*100,1]];
@@ -424,5 +439,5 @@ function renderDq(){
   const badge=t=>t?`<span class="badge b-t">${t}</span>`:'—';
   document.getElementById('dqTable').innerHTML='<tr><th>Data Source</th><th>Feeds</th><th>Known Issue</th><th>Owner</th><th>Conclusion</th></tr>'+D.dq.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]||'—'}</td><td>${r[3]}</td><td>${badge(r[4])}</td></tr>`).join('');
 }
-renderExecStatic(); renderExec(); renderMarketingStatic(); renderAwr(); renderReg(); renderFun(); renderCou(); renderCouStatic(); renderMarketStatic(); renderAja(); renderDq();
+renderExecStatic(); renderExec(); renderMarketingStatic(); renderCh(); renderAwr(); renderReg(); renderFun(); renderCou(); renderCouStatic(); renderMarketStatic(); renderAja(); renderDq();
 </script></body></html>
